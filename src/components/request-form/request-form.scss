@@ -1,0 +1,32 @@
+.request-params {
+    width: 100%;
+
+    &__header {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        font-weight: 600;
+        width: 100%;
+
+        .column {
+            padding: 0px 8px;
+            text-align: center;
+            box-shadow: 1px 1px 0px 0px #eeeeee, inset 1px 1px 0px 0px #eeeeee;
+        }
+    }
+
+    &__body {
+        .row {
+            display: flex;
+            flex-direction: row;
+
+            .column {
+                box-shadow: 1px 1px 0px 0px #eeeeee, inset 1px 1px 0px 0px #eeeeee;
+                padding: 4px 8px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+    }
+}

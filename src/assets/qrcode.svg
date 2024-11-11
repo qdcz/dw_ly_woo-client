@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="80px" height="80px" viewBox="0 0 80 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>icon-login-qrcode</title>
+    <defs>
+        <path d="M0,0 L72,0 C76.418278,-8.11624501e-16 80,3.581722 80,8 L80,80 L80,80 L0,0 Z" id="path-1"></path>
+    </defs>
+    <g id="icon-login-qrcode" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <use id="蒙版" fill="#E5F0FF" xlink:href="#path-1"></use>
+        <g id="编组" mask="url(#mask-2)">
+            <g transform="translate(23.000000, 13.000000)">
+                <rect id="矩形" stroke="#888888" stroke-width="4" fill="none" x="26" y="2" width="16" height="16"></rect>
+                <rect id="矩形备份-9" stroke="none" fill="#888888" fill-rule="evenodd" x="16" y="0" width="4" height="8"></rect>
+                <rect id="矩形备份-10" stroke="none" fill="#888888" fill-rule="evenodd" x="12" y="8" width="4" height="4"></rect>
+                <rect id="矩形备份-15" stroke="none" fill="#888888" fill-rule="evenodd" x="0" y="0" width="4" height="4"></rect>
+                <rect id="矩形备份-21" stroke="none" fill="#888888" fill-rule="evenodd" x="36" y="24" width="8" height="4"></rect>
+                <rect id="矩形备份-20" stroke="none" fill="#888888" fill-rule="evenodd" x="32" y="28" width="8" height="4"></rect>
+                <rect id="矩形备份-19" stroke="none" fill="#888888" fill-rule="evenodd" x="24" y="24" width="8" height="4"></rect>
+                <rect id="矩形备份-18" stroke="none" fill="#888888" fill-rule="evenodd" x="36" y="40" width="8" height="4"></rect>
+                <rect id="矩形" stroke="none" fill="#888888" fill-rule="evenodd" x="24" y="36" width="8" height="8"></rect>
+                <rect id="矩形备份-12" stroke="none" fill="#888888" fill-rule="evenodd" x="16" y="12" width="4" height="8"></rect>
+                <rect id="矩形" stroke="none" fill="#888888" fill-rule="evenodd" x="32" y="8" width="4" height="4"></rect>
+                <polygon id="路径-2" stroke="none" fill="#888888" fill-rule="evenodd" points="32 28 36 28 36 24 44 24 44 28 40 28 40 32 44 32 44 36 32 36"></polygon>
+                <polygon id="路径-2备份" stroke="none" fill="#888888" fill-rule="evenodd" points="0 8 4 8 4 4 12 4 12 8 8 8 8 12 12 12 12 16 0 16"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

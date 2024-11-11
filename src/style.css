@@ -1,0 +1,149 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #f2f2f2;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+
+  a:hover {
+    color: #747bff;
+  }
+
+}
+
+@tailwind base;
+/* @tailwind components; */
+@tailwind utilities;
+
+/* 定义一个类来隐藏滚动条 */
+.no-scrollbar {
+  /* 对所有主流浏览器隐藏滚动条 */
+  -ms-overflow-style: none;
+  /* IE 和 Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari 和 Opera */
+}
+
+/* 定义自定义滚动条样式 */
+.custom-scrollbar {
+  /* 应用 overflow 属性 */
+  @apply overflow-auto;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  /* 滚动条宽度 */
+  height: 8px;
+  /* 水平滚动条高度 */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #4b5563;
+  /* 滚动条滑块颜色 */
+  border-radius: 4px;
+  /* 滚动条滑块圆角 */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: #e5e7eb;
+  /* 滚动条轨道颜色 */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.flex {
+  display: flex;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+
+.jus-cen {
+  justify-content: center;
+}
+
+.jus-end {
+  justify-content: flex-end;
+}
+
+.jus-start {
+  justify-content: flex-start;
+}
+
+
+.ali-cen {
+  align-items: center;
+}
+
+.ali-end {
+  align-items: flex-end;
+}
+
+.ali-start {
+  align-items: flex-start;
+}
+
+.float-l {
+  float: left;
+}
+
+.float-r {
+  float: right;
+}
+
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
