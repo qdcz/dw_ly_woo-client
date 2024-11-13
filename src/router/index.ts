@@ -128,7 +128,7 @@ router.beforeEach(async (to, from, next) => {
     document.title = to.meta.title as string || "system manager";
 
     if (to.meta.layout) {
-        layoutStore.changeLayout(to.meta.layout as LayoutType);
+        layoutStore.changeLayout(to.meta.layout as any);
     } else {
         layoutStore.changeLayout("backstage");
     }

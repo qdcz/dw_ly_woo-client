@@ -7,6 +7,7 @@ import { ElMessage } from 'element-plus';
 
 import MonacoEditor from '@/components/monaco.vue';
 import editorFuncBox from '@/components/editor-func-box/index.jsx';
+import { LEFT_SIDEBAR_WIDTH, MIN_HEIGHT_PREPROCESSING_EDITOR } from '@/const';
 
 export default defineComponent({
     name: "mainContent",
@@ -18,7 +19,9 @@ export default defineComponent({
         const route = useRoute();
         const loading = ref(true);
         const preprocessingLoading = ref(true);
+        const postprocessingLoading = ref(true);
         const preprocessingFunc = ref<string | null>(null);
+        const postprocessingFunc = ref<string | null>(null);
         const APIInfo: any = ref({});
 
         const getMethodStyles = (method: string) => {
@@ -47,54 +50,157 @@ export default defineComponent({
             ElMessage.success('已复制到剪贴板');
         };
 
+        const handleSave = (type: 'preprocessing' | 'postprocessing', content: string) => {
+            ElMessage.success(`保存${type === 'preprocessing' ? '预处理' : '后处理'}函数成功`);
+            // TODO: 这里添加保存逻辑
+        };
+
+        // 抽象处理函数编辑器组件
+        const ProcessingEditor = ({ type, loading, func }) => (
+            <div>
+                <div class={cn("text-lg font-semibold mb-4")}>{type}</div>
+                <div class={cn(
+                    `relative w-full h-full min-h-[${MIN_HEIGHT_PREPROCESSING_EDITOR}px]`,
+                    "border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden",
+                    "shadow-sm hover:shadow-md",
+                    "transition-shadow duration-300",
+                )}>
+                    {/* loading 动画 */}
+                    <div class={cn(
+                        "absolute",
+                        "bg-white dark:bg-gray-900",
+                        "flex items-center justify-center", 
+                        "w-full h-full",
+                        "transition-all duration-500 ease-in-out",
+                        loading.value ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+                    )}>
+                        <div class={cn(
+                            "animate-spin rounded-full",
+                            "h-8 w-8",
+                            "border-b-2 border-blue-500",
+                            "transition-all duration-500",
+                            loading.value ? "opacity-100 rotate-0" : "opacity-0 rotate-180"
+                        )}></div>
+                    </div>
+                    {/* 编辑器 */}
+                    <div class={cn("flex flex-wrap gap-3 w-full h-full")}>
+                        {!loading.value && (
+                            <editorFuncBox
+                                name={type}
+                                paramString="params, utils, plugin"
+                                class={cn(
+                                    `w-full min-h-[${MIN_HEIGHT_PREPROCESSING_EDITOR}px] rounded-lg overflow-hidden`,
+                                    "border border-gray-200 dark:border-gray-700",
+                                    "shadow-sm hover:shadow-md",
+                                    "transition-shadow duration-300",
+                                    "relative",
+                                    "before:absolute before:inset-0",
+                                    "before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent",
+                                    "after:absolute after:inset-0",
+                                    "after:bg-gradient-to-r after:from-transparent after:via-white/10 after:to-transparent",
+                                    "before:-translate-x-full hover:before:translate-x-full",
+                                    "before:transition-transform before:duration-[2s] before:ease-in-out",
+                                    "after:-translate-x-full hover:after:translate-x-full",
+                                    "after:transition-transform after:duration-[2s] after:ease-in-out after:delay-500"
+                                )}
+                            >
+                                <MonacoEditor
+                                    initialValue={func.value}
+                                    initialLanguage="javascript"
+                                    className={cn(
+                                        `b${type}Editor`,
+                                        "bg-gray-50 dark:bg-black",
+                                    )}
+                                    style={{ height: MIN_HEIGHT_PREPROCESSING_EDITOR + 'px' }}
+                                    onKeydown={(e) => {
+                                        // 检测 Ctrl+S 或 Command+S
+                                        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                                            e.preventDefault();
+                                            const content = e.target.getValue();
+                                            handleSave(type, content);
+                                        }
+                                    }}
+                                />
+                            </editorFuncBox>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+
         onMounted(() => {
             APIs._APIInfo({ id: route.query.id as string }).then((res: any) => {
-                // console.log(res.data);
                 if (res.code === 200) {
                     APIInfo.value = res.data;
                 }
             }).finally(() => {
-                loading.value = false;
+                setTimeout(() => {
+                    loading.value = false;
+                }, 300);
             });
 
             APIs._GetAPIModuleHook({ apiId: route.query.id as string, hookType: 1 }).then((res: any) => {
-                // console.log(res.data);
                 if (res.code === 200) {
                     if (res.data.length > 0) {
-                        preprocessingFunc.value = res.data[0];
+                        preprocessingFunc.value = res.data[0].logic;
                     } else {
                         preprocessingFunc.value = null;
                     }
                 }
             }).finally(() => {
-                preprocessingLoading.value = false;
+                setTimeout(() => {
+                    preprocessingLoading.value = false;
+                }, 1000);
+            });
+
+            APIs._GetAPIModuleHook({ apiId: route.query.id as string, hookType: 2 }).then((res: any) => {
+                if (res.code === 200) {
+                    if (res.data.length > 0) {
+                        postprocessingFunc.value = res.data[0].logic;
+                    } else {
+                        postprocessingFunc.value = null;
+                    }
+                }
+            }).finally(() => {
+                setTimeout(() => {
+                    postprocessingLoading.value = false;
+                }, 1000);
             });
         });
 
         return () => (
-            <div class={cn(
-                "text-gray-900 dark:text-gray-100 relative h-screen w-full",
-            )}>
-                <div class="p-4">
-                    <div class="text-2xl font-bold">{APIInfo.value?.name}</div>
-                    <div class="text-gray-600 dark:text-gray-400 mt-1 text-sm">{APIInfo.value?.description}</div>
-                    <div class="flex items-center space-x-2 mt-2">
+            <div class={cn("text-gray-900 dark:text-gray-100 relative h-screen w-full")}>
+                {/* API Info */}
+                <div class={cn("p-4")}>
+                    <div class={cn("text-2xl font-bold")}>{APIInfo.value?.name}</div>
+                    <div class={cn("text-gray-600 dark:text-gray-400 mt-1 text-sm")}>{APIInfo.value?.description}</div>
+                    <div class={cn("flex items-center space-x-2 mt-2")}>
                         <div class={cn(
                             getMethodStyles(API_METHOD[APIInfo.value?.method]),
-                            "rounded-[4px] py-1 px-2 cursor-pointer select-none inline-block",
+                            "rounded-[4px]",
+                            "py-1 px-2",
+                            "cursor-pointer select-none inline-block",
                             "text-gray-600 dark:text-slate-50",
                             "font-[600]",
                             "transition-colors duration-300"
                         )}>{API_METHOD[APIInfo.value?.method]}</div>
-                        <div class="text-gray-600 dark:text-slate-50 cursor-pointer relative group" onClick={() => copyToClipboard(`/visix/api/${APIInfo.value?.path}/${route.query.id}`)}>
+                        <div class={cn(
+                            "text-gray-600 dark:text-slate-50",
+                            "cursor-pointer relative group"
+                        )} onClick={() => copyToClipboard(`/visix/api/${APIInfo.value?.path}/${route.query.id}`)}>
                             <div>/visix/api/{APIInfo.value?.path}/{route.query.id}</div>
                             <div class={cn(
-                                "absolute -bottom-1.5 left-0 w-0 h-[2px] animate-pulse",
-                                "group-hover:w-full transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
-                                "bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 bg-[length:100%_auto] animate-gradient"
+                                "absolute -bottom-1.5 left-0 w-0 h-[2px]",
+                                "animate-pulse",
+                                "group-hover:w-full",
+                                "transition-all duration-300",
+                                "ease-[cubic-bezier(0.4,0,0.2,1)]",
+                                "bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500",
+                                "bg-[length:100%_auto]",
+                                "animate-gradient"
                             )}></div>
                         </div>
-                        <div class="flex items-center gap-2 text-gray-600 dark:text-slate-50 text-sm">
+                        <div class={cn("flex items-center gap-2 text-gray-600 dark:text-slate-50 text-sm")}>
                             <div class={cn(
                                 "w-2 h-2 rounded-full",
                                 getStepStyles(APIInfo.value.step)
@@ -103,83 +209,54 @@ export default defineComponent({
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-4 mt-4 text-sm text-gray-600 dark:text-gray-400">
-                        <div class="flex items-center gap-2">
+                    <div class={cn("flex items-center gap-4 mt-4 text-sm text-gray-600 dark:text-gray-400")}>
+                        <div class={cn("flex items-center gap-2")}>
                             <span>createdAt:</span>
                             <span>{new Date(APIInfo.value?.createdAt).toLocaleString()}</span>
                         </div>
-                        <div class="flex items-center gap-2">
+                        <div class={cn("flex items-center gap-2")}>
                             <span>updatedAt:</span>
                             <span>{new Date(APIInfo.value?.updatedAt).toLocaleString()}</span>
                         </div>
                     </div>
 
+                    {/* 前后置函数部分 */}
+                    <div class={cn("mt-8 grid grid-cols-2 gap-4")}>
+                        {/* 前置函数 */}
+                        <ProcessingEditor
+                            type="preprocessing"
+                            loading={preprocessingLoading}
+                            func={preprocessingFunc}
+                        />
 
-                    <div class="mt-8">
-                        <div class="text-lg font-semibold mb-4">preprocessing</div>
-                        <div class="relative w-full h-full">
-                            {preprocessingLoading.value && (
-                                <div class="absolute inset-0 bg-white dark:bg-gray-900 flex items-center justify-center">
-                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                                </div>
-                            )}
-                            <div class="flex flex-wrap gap-3 w-full h-full">
-                                {preprocessingFunc.value != null ? (
-                                    <editorFuncBox
-                                        name={"preprocessing"}
-                                        paramString="params, utils, plugin"
-                                        class={cn(
-                                            "w-full rounded-lg overflow-hidden",
-                                            "border border-gray-200 dark:border-gray-700",
-                                            "shadow-sm hover:shadow-md transition-shadow duration-300",
-                                            "relative before:absolute before:inset-0",
-                                            "before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent",
-                                            "after:absolute after:inset-0",
-                                            "after:bg-gradient-to-r after:from-transparent after:via-white/10 after:to-transparent",
-                                            "before:-translate-x-full hover:before:translate-x-full before:transition-transform before:duration-[2s] before:ease-in-out",
-                                            "after:-translate-x-full hover:after:translate-x-full after:transition-transform after:duration-[2s] after:ease-in-out after:delay-500"
-                                        )}
-                                    >
-                                        <MonacoEditor
-                                            initialValue={"preprocessingFunc.value"}
-                                            initialLanguage="javascript"
-                                            className={cn(
-                                                "bpreprocessingEditor h-48",
-                                                "bg-gray-50 dark:bg-black"
-                                            )}
-                                        />
-                                    </editorFuncBox>
-                                ) : (
-                                    <div
-                                        class={cn(
-                                            "px-3 py-2 rounded-lg border border-dashed",
-                                            "border-gray-300 dark:border-gray-600",
-                                            "hover:border-blue-500 dark:hover:border-blue-400",
-                                            "cursor-pointer transition-all duration-300",
-                                            "flex items-center gap-2"
-                                        )}
-                                    >
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                        </svg>
-                                        <span class="text-sm">添加前置节点</span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
+                        {/* 后置函数 */}
+                        <ProcessingEditor
+                            type="postprocessing"
+                            loading={postprocessingLoading}
+                            func={postprocessingFunc}
+                        />
                     </div>
-                </div >
+                </div>
 
-
-                {
-                    loading.value && (
-                        <div class="fixed inset-0 bg-white dark:bg-gray-900 flex items-center justify-center">
-                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                        </div>
-                    )
-                }
-            </div >
+                {/* Loading */}
+                <div class={cn(
+                    "fixed",
+                    `w-[calc(100%-${LEFT_SIDEBAR_WIDTH}px)]`,
+                    "inset-0",
+                    "bg-white dark:bg-gray-900",
+                    "px-4 lg:pr-4 lg:m-2",
+                    "lg:rounded-lg lg:shadow-sm",
+                    "flex items-center justify-center",
+                    "transition-opacity duration-300",
+                    loading.value ? "opacity-100" : "opacity-0 pointer-events-none"
+                )}>
+                    <div class={cn(
+                        "animate-spin rounded-full",
+                        "h-8 w-8",
+                        "border-b-2 border-blue-500"
+                    )}></div>
+                </div>
+            </div>
         );
     }
 });

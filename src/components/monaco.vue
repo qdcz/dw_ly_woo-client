@@ -71,7 +71,7 @@ export default {
     emits: ["getUtils", "contentChange"],
     props: {
         initialValue: {
-            type: String,
+            type: [String, null],
             required: true,
         },
         initialLanguage: {

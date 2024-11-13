@@ -1,0 +1,2 @@
+export const LEFT_SIDEBAR_WIDTH = 60;
+export const MIN_HEIGHT_PREPROCESSING_EDITOR = 400;

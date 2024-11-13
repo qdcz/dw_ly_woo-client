@@ -1,4 +1,5 @@
 import { defineComponent, Transition } from 'vue';
+import { cn } from '@/utils/index';
 
 export default defineComponent({
     name: "Confirm",
@@ -38,7 +39,7 @@ export default defineComponent({
                 >
                     {props.isOpen && (
                         <div
-                            class="fixed inset-0 bg-black/30 dark:bg-black/50 z-[98]"
+                            class={cn("fixed inset-0 bg-black/30 dark:bg-black/50 z-[98]")}
                             onClick={(e: MouseEvent) => props.onCancel(e)}
                         />
                     )}
@@ -54,30 +55,49 @@ export default defineComponent({
                     leaveToClass="opacity-0 scale-75"
                 >
                     {props.isOpen && (
-                        <div class="fixed inset-0 z-[99] flex items-center justify-center">
+                        <div class={cn("fixed inset-0 z-[99] flex items-center justify-center")}>
                             <div
-                                class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-[90%] max-w-md p-6 animate-wiggle"
+                                class={cn(
+                                    "bg-white dark:bg-gray-800",
+                                    "rounded-lg shadow-xl",
+                                    "w-[90%] max-w-md p-6",
+                                    "animate-wiggle"
+                                )}
                                 onClick={(e) => e.stopPropagation()}
                             >
-                                <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
+                                <h3 class={cn("text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4")}>
                                     {props.title}
                                 </h3>
-                                <div class="mt-2">
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                <div class={cn("mt-2")}>
+                                    <p class={cn("text-sm text-gray-500 dark:text-gray-400")}>
                                         {props.message}
                                     </p>
                                 </div>
-                                <div class="mt-6 flex justify-end space-x-3">
+                                <div class={cn("mt-6 flex justify-end space-x-3")}>
                                     <button
                                         type="button"
-                                        class="inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                                        class={cn(
+                                            "inline-flex justify-center rounded-md",
+                                            "border border-gray-300 dark:border-gray-600",
+                                            "bg-white dark:bg-gray-700",
+                                            "px-4 py-2 text-sm font-medium",
+                                            "text-gray-700 dark:text-gray-200",
+                                            "hover:bg-gray-50 dark:hover:bg-gray-600",
+                                            "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                                        )}
                                         onClick={(e: MouseEvent) => props.onCancel(e)}
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="button"
-                                        class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                                        class={cn(
+                                            "inline-flex justify-center rounded-md",
+                                            "border border-transparent",
+                                            "bg-indigo-600 hover:bg-indigo-700",
+                                            "px-4 py-2 text-sm font-medium text-white",
+                                            "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                                        )}
                                         onClick={(e: MouseEvent) => props.onConfirm(e)}
                                     >
                                         Confirm
