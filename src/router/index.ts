@@ -5,11 +5,6 @@ import { UserStore, LayoutStore } from "../store/index";
 
 const routes = [
     {
-        path: "/main",
-        component: () => import("../view/client/main/main.vue"),
-        meta: { title: "main page", layout: "foreground" },
-    },
-    {
         path: "/",
         component: () => import("../view/home.vue"),
         meta: { title: "Home Page", layout: "backstage" },

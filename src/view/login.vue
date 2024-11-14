@@ -176,7 +176,7 @@ export default {
                     data.verifyCodeBtnContext = "获取验证码";
                     data.verifyCodeDisabled = false;
                 }
-            }, 1000);
+            }, 1000) as unknown as number;
 
             // const userStore = UserStore();
             // const verifyCode = await userStore.getVerifyCode(form.account);

@@ -133,7 +133,6 @@ export default {
 
         const uploadRef = ref(); // 上传组件dom实例
         let presignedUrl = ref(""); // 带有时效性的上传url
-        const fileList = ref([]);    // 上传图片
 
         // 编辑表单数据
         const editForm = ref({
@@ -211,6 +210,8 @@ export default {
                                     bucketName: "visix",
                                     objectName: encodeURIComponent(i.banner),
                                 }).then((res) => {
+                                    const minioBase = import.meta.env.VITE_MINIO_ENDPOINT + ":" + import.meta.env.VITE_MINIO_PORT;
+                                    res.data = res.data.replace(/http:\/\/[^\/]+:\d+/g, `http://${minioBase}`);
                                     imageCache.set(i.banner, res.data, 1000 * 60 * 20);
                                     i.__banner = imageCache.get(i.banner)
                                 })
@@ -309,6 +310,8 @@ export default {
                     bucketName: "visix",
                     objectName: encodeURIComponent(rowData.banner),
                 }).then((res) => {
+                    const minioBase = import.meta.env.VITE_MINIO_ENDPOINT + ":" + import.meta.env.VITE_MINIO_PORT;
+                    res.data = res.data.replace(/http:\/\/[^\/]+:\d+/g, `http://${minioBase}`);
                     imageCache.set(rowData.banner, res.data, 1000 * 60 * 20);
                     editForm.value.__banner = imageCache.get(rowData.banner)
                 })
@@ -414,16 +417,22 @@ export default {
                     expires: 1000 * 60
                 });
 
+                // 替换预签名URL中的域名和端口
+                const minioEndpoint = import.meta.env.VITE_MINIO_ENDPOINT;
+                const minioPort = import.meta.env.VITE_MINIO_PORT;
+                const minioBase = `${minioEndpoint}:${minioPort}`;
+
                 if (code !== 200) {
                     ElMessage.error("生成预上传链接失败");
                     return
                 }
 
-
+                const uploadImageUrl = data.replace(/http:\/\/[^\/]+:\d+/g, `http://${minioBase}`);
+                console.log(5656, uploadImageUrl);
 
                 // 使用自定义上传
                 const xhr = new XMLHttpRequest();
-                xhr.open('PUT', data, true);
+                xhr.open('PUT', uploadImageUrl, true);
                 xhr.setRequestHeader('Content-Type', rawFile.raw.type);
                 xhr.onload = function () {
                     if (xhr.status === 200) {
@@ -470,7 +479,6 @@ export default {
             databaseType,
             selectDataBase,
             presignedUrl,
-            fileList,
             editDialogVisible,
             editForm,
             editFormRules,

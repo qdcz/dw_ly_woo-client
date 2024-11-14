@@ -54,6 +54,7 @@ export default defineComponent({
                         <span class="mtk mtk2">{nameBridge.value}</span>
                         <span class="mtk mtk3"> {"("} </span>
                         <span class="mtk mtk4">{paramsBridge.value}</span>
+                        <span class="mtk mtk3"> {")"} </span>
                     </div>
                 )}
 

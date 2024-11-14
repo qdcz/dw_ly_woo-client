@@ -1,6 +1,6 @@
 import { defineComponent, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { cn } from '@/utils/index';
+import { cn, deepClone } from '@/utils/index';
 import { API_METHOD, API_STEP } from '@/constants';
 import APIs from '@/components/foreground/pages/API/APIs';
 import { ElMessage } from 'element-plus';
@@ -8,6 +8,14 @@ import { ElMessage } from 'element-plus';
 import MonacoEditor from '@/components/monaco.vue';
 import editorFuncBox from '@/components/editor-func-box/index.jsx';
 import { LEFT_SIDEBAR_WIDTH, MIN_HEIGHT_PREPROCESSING_EDITOR } from '@/const';
+
+const defaultPrePostprocessingForm = {
+    id: '',
+    name: '',
+    params: '',
+    logic: '',
+    description: '',
+}
 
 export default defineComponent({
     name: "mainContent",
@@ -20,8 +28,10 @@ export default defineComponent({
         const loading = ref(true);
         const preprocessingLoading = ref(true);
         const postprocessingLoading = ref(true);
-        const preprocessingFunc = ref<string | null>(null);
-        const postprocessingFunc = ref<string | null>(null);
+        const preprocessingEditForm = ref(deepClone(defaultPrePostprocessingForm));
+        const postprocessingEditForm = ref(deepClone(defaultPrePostprocessingForm));
+        const preprocessingEditorRef: any = ref(null);
+        const postprocessingEditorRef: any = ref(null);
         const APIInfo: any = ref({});
 
         const getMethodStyles = (method: string) => {
@@ -33,6 +43,7 @@ export default defineComponent({
             };
             return styles[method] || styles['DELETE'];
         };
+
 
         const getStepStyles = (step: number) => {
             const styles = {
@@ -50,17 +61,55 @@ export default defineComponent({
             ElMessage.success('已复制到剪贴板');
         };
 
-        const handleSave = (type: 'preprocessing' | 'postprocessing', content: string) => {
-            ElMessage.success(`保存${type === 'preprocessing' ? '预处理' : '后处理'}函数成功`);
-            // TODO: 这里添加保存逻辑
+        const handleCopy = (type: 'preprocessing' | 'postprocessing') => {
+            const rowData = type === 'preprocessing' ? preprocessingEditForm : postprocessingEditForm;
+            navigator.clipboard.writeText(rowData.value.logic);
+            ElMessage.success(`复制${type === 'preprocessing' ? '预处理' : '后处理'}函数成功`);
+        };
+
+        const fullPage = (type: 'preprocessing' | 'postprocessing') => {
+            ElMessage.success(`全屏${type === 'preprocessing' ? '预处理' : '后处理'}函数`);
+        };
+
+        const handleSave = (type: 'preprocessing' | 'postprocessing') => {
+            const editorRef = type === 'preprocessing' ? preprocessingEditorRef : postprocessingEditorRef;
+            const content = editorRef.value?.getContentValue();
+
+
+            const formData = type === 'preprocessing' ? preprocessingEditForm : postprocessingEditForm;
+            const hookType = type === 'preprocessing' ? 1 : 2;
+            const apiCall = !formData.value.id ?
+                APIs._APIModuleAddHook({
+                    apiId: APIInfo.value.id,
+                    hookType,
+                    logic: content,
+                    name: `api_${type}_${APIInfo.value.id}`,
+                    description: `适用于${APIInfo.value.id}接口的${type === 'preprocessing' ? '预处理' : '后处理'}脚本`,
+                }) :
+                APIs._UpdateAPIModuleHook({
+                    id: formData.value.id,
+                    data: {
+                        name: formData.value.name,
+                        logic: content,
+                        description: formData.value.description,
+                        type: hookType,
+                    }
+                });
+
+            apiCall.then((res: any) => {
+                if (res.code === 200) {
+                    ElMessage.success(`保存${type === 'preprocessing' ? '预处理' : '后处理'}函数成功`);
+                }
+            });
+
         };
 
         // 抽象处理函数编辑器组件
-        const ProcessingEditor = ({ type, loading, func }) => (
+        const ProcessingEditor = ({ type, loading, func, editorRef }) => (
             <div>
-                <div class={cn("text-lg font-semibold mb-4")}>{type}</div>
+                {/* <div class={cn("text-lg font-semibold mb-4")}>{type}</div> */}
                 <div class={cn(
-                    `relative w-full h-full min-h-[${MIN_HEIGHT_PREPROCESSING_EDITOR}px]`,
+                    `relative w-full min-h-[${MIN_HEIGHT_PREPROCESSING_EDITOR}px]`,
                     "border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden",
                     "shadow-sm hover:shadow-md",
                     "transition-shadow duration-300",
@@ -69,8 +118,8 @@ export default defineComponent({
                     <div class={cn(
                         "absolute",
                         "bg-white dark:bg-gray-900",
-                        "flex items-center justify-center", 
-                        "w-full h-full",
+                        "flex items-center justify-center",
+                        "w-full h-50",
                         "transition-all duration-500 ease-in-out",
                         loading.value ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
                     )}>
@@ -103,9 +152,12 @@ export default defineComponent({
                                     "after:-translate-x-full hover:after:translate-x-full",
                                     "after:transition-transform after:duration-[2s] after:ease-in-out after:delay-500"
                                 )}
+                                onOnCopy={() => handleCopy(type)}
+                                onOnFullPage={() => fullPage(type)}
                             >
                                 <MonacoEditor
-                                    initialValue={func.value}
+                                    ref={editorRef}
+                                    initialValue={func}
                                     initialLanguage="javascript"
                                     className={cn(
                                         `b${type}Editor`,
@@ -116,8 +168,7 @@ export default defineComponent({
                                         // 检测 Ctrl+S 或 Command+S
                                         if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                                             e.preventDefault();
-                                            const content = e.target.getValue();
-                                            handleSave(type, content);
+                                            handleSave(type);
                                         }
                                     }}
                                 />
@@ -142,9 +193,9 @@ export default defineComponent({
             APIs._GetAPIModuleHook({ apiId: route.query.id as string, hookType: 1 }).then((res: any) => {
                 if (res.code === 200) {
                     if (res.data.length > 0) {
-                        preprocessingFunc.value = res.data[0].logic;
+                        preprocessingEditForm.value = res.data[0];
                     } else {
-                        preprocessingFunc.value = null;
+                        preprocessingEditForm.value = deepClone(defaultPrePostprocessingForm);
                     }
                 }
             }).finally(() => {
@@ -156,9 +207,9 @@ export default defineComponent({
             APIs._GetAPIModuleHook({ apiId: route.query.id as string, hookType: 2 }).then((res: any) => {
                 if (res.code === 200) {
                     if (res.data.length > 0) {
-                        postprocessingFunc.value = res.data[0].logic;
+                        postprocessingEditForm.value = res.data[0];
                     } else {
-                        postprocessingFunc.value = null;
+                        postprocessingEditForm.value = deepClone(defaultPrePostprocessingForm);
                     }
                 }
             }).finally(() => {
@@ -219,21 +270,22 @@ export default defineComponent({
                             <span>{new Date(APIInfo.value?.updatedAt).toLocaleString()}</span>
                         </div>
                     </div>
-
                     {/* 前后置函数部分 */}
                     <div class={cn("mt-8 grid grid-cols-2 gap-4")}>
                         {/* 前置函数 */}
                         <ProcessingEditor
                             type="preprocessing"
+                            editorRef={preprocessingEditorRef}
                             loading={preprocessingLoading}
-                            func={preprocessingFunc}
+                            func={preprocessingEditForm.value.logic}
                         />
 
                         {/* 后置函数 */}
                         <ProcessingEditor
                             type="postprocessing"
+                            editorRef={postprocessingEditorRef}
                             loading={postprocessingLoading}
-                            func={postprocessingFunc}
+                            func={postprocessingEditForm.value.logic}
                         />
                     </div>
                 </div>

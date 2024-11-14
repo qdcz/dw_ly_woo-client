@@ -5,14 +5,7 @@ import { UserStore } from "../store/user/user";
 
 // 创建一个 axios 实例
 const request = axios.create({
-    // 请求地址前缀
-    // baseURL: process.env.VUE_APP_BASE_URL,
-    baseURL: "https://127.0.0.1:4999/visix/",
-    // baseURL: "https://192.168.5.172:4999/visix/",
-    // baseURL: "https://127.0.0.1:4999/visix/",
-    // baseURL: "https://192.168.2.7:4999/visix/",
-    // baseURL: "https://81.69.20.73:3000/visix/",
-    // 超时时间
+    baseURL: import.meta.env.VITE_API_BASE_URL,
     timeout: 30000,
 });
 

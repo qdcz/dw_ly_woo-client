@@ -85,7 +85,7 @@ const gen_component = (list?:any) => {
 const hookFramework = (obj?:any) => {
     const _obj = {
         toolId: "@Snxun_datav_sn-cp-tools_jSRNj",
-        startingPoint: `` || gen_component() // 内容
+        startingPoint: gen_component() // 内容
     }
     
     Object.assign(_obj, obj)

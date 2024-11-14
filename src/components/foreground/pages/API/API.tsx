@@ -24,19 +24,19 @@ export default defineComponent({
         const currentPage = ref(1);
         const pageSize = ref(10);
         const total = ref(0);
-        const isAPIEditOpen = ref(false);
-        const handleCurrentChange = (val: number) => {
-            currentPage.value = val;
-        };
+        // const isAPIEditOpen = ref(false);
+        // const handleCurrentChange = (val: number) => {
+        //     currentPage.value = val;
+        // };
 
-        const handleSizeChange = (val: number) => {
-            pageSize.value = val;
-            currentPage.value = 1;
-            APIs._APIModuleList({
-                page: currentPage.value,
-                take: pageSize.value
-            });
-        };
+        // const handleSizeChange = (val: number) => {
+        //     pageSize.value = val;
+        //     currentPage.value = 1;
+        //     APIs._APIModuleList({
+        //         page: currentPage.value,
+        //         take: pageSize.value
+        //     });
+        // };
 
         const trigger = (e: MouseEvent) => {
             // 获取最近的data-id元素

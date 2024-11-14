@@ -1,4 +1,4 @@
-import { APIModuleList, APIModuleInfo, GetAPIModuleHook } from '@/api';
+import { APIModuleList, APIModuleInfo, GetAPIModuleHook, APIModuleAddHook, UpdateAPIModuleHook } from '@/api';
 
 
 // 获取API模块列表
@@ -31,8 +31,22 @@ const _GetAPIModuleHook = (params) => {
     return GetAPIModuleHook(params)
 };
 
+// 新增API前后置hook
+const _APIModuleAddHook = (params) => {
+    return APIModuleAddHook(params)
+};
+
+// 更新API前后置hook
+const _UpdateAPIModuleHook = (params) => {
+    return UpdateAPIModuleHook(params.id, params.data)
+};
+
+// 更新API
+
 export default {
     _APIModuleList,
     _APIInfo,
-    _GetAPIModuleHook
+    _GetAPIModuleHook,
+    _APIModuleAddHook,
+    _UpdateAPIModuleHook
 }
