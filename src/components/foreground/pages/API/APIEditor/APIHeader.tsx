@@ -1,7 +1,9 @@
 import { computed, defineComponent, ref } from 'vue';
 import ParamsForm from '@/components/params-form/params-form';
-import { cn, deepClone } from '@/utils/index';
+import { cn, deepClone, generateUuid } from '@/utils/index';
 import Switch from '@/components/foreground/input/switch';
+
+
 
 export default defineComponent({
     name: 'APIHeader',
@@ -23,42 +25,68 @@ export default defineComponent({
             { name: "描述", width: "50" }
         ];
 
+        const headerBodyTemplate = [
+            {
+                type: "input",
+                placeholder: "请输入自定义字段-键名",
+                value: "1",
+                id: "",
+            },
+            {
+                type: "input",
+                placeholder: "请输入自定义字段-键值",
+                value: "2",
+                id: "",
+            },
+            {
+                type: "input",
+                placeholder: "字段说明",
+                value: "3",
+                id: "",
+            },
+        ]
+
         // Enable real-time synchronization
         const enableHaderRealTimeSync = ref(false);
 
-        const headerDataBridge = computed(() => {
-            return props.headers.map(
-                (i: any) => {
-                    return [
-                        {
-                            type: "input",
-                            placeholder: "请输入自定义字段-键名",
-                            value: i.key,
-                            id: i.id,
-                        },
-                        {
-                            type: "input",
-                            placeholder: "请输入自定义字段-键值",
-                            value: i.value,
-                            id: i.id,
-                        },
-                        {
-                            type: "input",
-                            placeholder: "字段说明",
-                            value: i.info,
-                            id: i.id,
-                        },
-                    ];
-                }
-            );;
+        const headerDataBridge = computed({
+            get: () => {
+                return props.headers.map(
+                    (i: any) => {
+                        console.log(555,deepClone(headerData).map(item => {
+                            console.log(666,i);
+                            return {
+                                type: "input",
+                                placeholder: "请输入自定义字段-键值",
+                                value: i.value || "",
+                                id: i.id || generateUuid(),
+                            }
+                        }));
+                        
+                        return deepClone(headerData).map(item => {
+                            return {
+                                type: "input",
+                                placeholder: "请输入自定义字段-键值",
+                                value: item.value || "",
+                                id: item.id || generateUuid(),
+                            }
+                        })
+                    }
+                );
+            },
+            set: (val) => {
+                emit('headerDataChange', val);
+            }
         });
 
         const AddHeaderParams = () => {
             if (props.headers && props.headers.length > 0) {
-                headerDataBridge.value.push(deepClone(props.headers[props.headers.length - 1]))
+                // headerDataBridge.value.push(deepClone(props.headers[props.headers.length - 1]))
+                headerDataBridge.value = deepClone(props.headers[props.headers.length - 1])
+            } else {
+                headerDataBridge.value = deepClone(headerBodyTemplate)
             }
-            emit("headerDataChange",)
-            console.log(666, headerDataBridge.value);
+            console.log(props.headers,headerDataBridge.value);
         };
 
         const handleItemAdd = (newItem) => {

@@ -272,9 +272,9 @@ export default defineComponent({
             });
 
             APIs._APIModuleBindRequest({ apiModuleId: route.query.id as string }).then((res: any) => {
-                if (res.code === 200) {
+                if (res.code === 200 && res.data) {
                     APIHeaders.value = JSON.parse(res.data.headerSchema);
-                }   
+                }
             });
         });
 
@@ -355,7 +355,9 @@ export default defineComponent({
                                     <div class={cn("text-lg font-bold")}>
                                         <APIHeader
                                             headers={APIHeaders.value}
-                                            on
+                                            onHeaderDataChange={(e: any) => {
+                                                APIHeaders.value.push(e as never);
+                                            }}
                                         />
                                     </div>
                                 </div>

@@ -185,7 +185,7 @@ export default defineComponent({
 
                     <div class={cn("px-2")}>
                         <Circle
-                            class={cn("cursor-pointer")}
+                            class={cn("cursor-pointer select-none")}
                             width="20px"
                             height="20px"
                             onClick={() => header_itemAdd()}
@@ -213,7 +213,7 @@ export default defineComponent({
                             ))}
                             <div class={cn("px-2")}>
                                 <Circle
-                                    class={cn("cursor-pointer")}
+                                    class={cn("cursor-pointer select-none")}
                                     width="20px"
                                     height="20px"
                                     type="minus"
