@@ -1,6 +1,6 @@
 import { defineComponent, computed } from "vue";
-import { FullScreen, DocumentCopy } from "@element-plus/icons-vue";
-
+import { FullScreen, DocumentCopy, CaretLeft } from "@element-plus/icons-vue";
+import RunIcon from "@/components/foreground/icon/Run.tsx";
 export const props = {
     name: {
         type: [String],
@@ -22,12 +22,39 @@ export const props = {
         type: [Boolean],
         default: true,
     },
+    isShowFold: {
+        type: [Boolean],
+        default: false,
+    },
+    isShowCopy: {
+        type: [Boolean],
+        default: false,
+    },
+    isShowFullPage: {
+        type: [Boolean],
+        default: false,
+    },
+    isShowRun: {
+        type: [Boolean],
+        default: false,
+    },
+    isFold: {
+        type: [Boolean],
+        default: false,
+    },
+    height: {
+        type: [Number],
+        default: 0,
+    },
 };
 
 export default defineComponent({
     name: "editor-func-box",
-    emits: ["onCopy", "onFullPage"],
+    emits: ["onCopy", "onFullPage", "onFold", "onRun"],
     props,
+    components: {
+        RunIcon,
+    },
     setup(props, ctx) {
         const nameBridge = computed(() => props.name);
         const paramsBridge = computed(() => {
@@ -45,30 +72,54 @@ export default defineComponent({
 
         const copy = () => ctx.emit && ctx.emit("onCopy");
         const fullPage = () => ctx.emit("onFullPage");
-
+        const fold = (isFold) => ctx.emit("onFold", isFold);
+        const run = () => ctx.emit("onRun");
         return () => (
             <div class="editor-func-box">
-                {props.header && (
+                {
+                    props.isFold && (
+                        <div class="foldCover" style={{ height: props.height + 'px' }} onClick={fold.bind(null, false)}>
+                            <span>{props.name}</span>
+                        </div>
+                    )
+                }
+                {props.header && !props.isFold && (
                     <div class="header">
-                        <span class="mtk mtk1">function </span>
-                        <span class="mtk mtk2">{nameBridge.value}</span>
-                        <span class="mtk mtk3"> {"("} </span>
-                        <span class="mtk mtk4">{paramsBridge.value}</span>
-                        <span class="mtk mtk3"> {")"} </span>
+                        <div>
+                            <span class="mtk mtk1">function </span>
+                            <span class="mtk mtk2">{nameBridge.value}</span>
+                            <span class="mtk mtk3"> {"("} </span>
+                            <span class="mtk mtk4">{paramsBridge.value}</span>
+                            <span class="mtk mtk3"> {")"} </span>
+                            <span class="mtk mtk3"> {"{"} </span>
+                        </div>
+                        {props.isShowFold && (
+                            <el-icon class="btn full" onClick={fold.bind(null, true)}>
+                                {<DArrowLeft />}
+                            </el-icon>
+                        )}
                     </div>
                 )}
-
-                <div>{ctx.slots.default && ctx.slots.default()}</div>
-                {props.footer && (
+                <div>{!props.isFold && ctx.slots.default && ctx.slots.default()}</div>
+                {props.footer && !props.isFold && (
                     <div class="footer">
                         <span class="mtk mtk3"> {"}"} </span>
                         <div>
-                            <el-icon class="btn copy" onClick={copy}>
-                                {<DocumentCopy />}
-                            </el-icon>
-                            <el-icon class="btn full" onClick={fullPage}>
-                                {<FullScreen />}
-                            </el-icon>
+                            {props.isShowRun && (
+                                <el-icon class="btn run" onClick={run}>
+                                    {<RunIcon />}
+                                </el-icon>
+                            )}
+                            {props.isShowCopy && (
+                                <el-icon class="btn copy" onClick={copy}>
+                                    {<DocumentCopy />}
+                                </el-icon>
+                            )}
+                            {props.isShowFullPage && (
+                                <el-icon class="btn full" onClick={fullPage}>
+                                    {<FullScreen />}
+                                </el-icon>
+                            )}
                         </div>
                     </div>
                 )}

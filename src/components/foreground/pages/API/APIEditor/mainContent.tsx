@@ -7,6 +7,7 @@ import { ElMessage } from 'element-plus';
 
 import MonacoEditor from '@/components/monaco.vue';
 import editorFuncBox from '@/components/editor-func-box/index.jsx';
+import APIHeader from './APIHeader';
 import { LEFT_SIDEBAR_WIDTH, MIN_HEIGHT_PREPROCESSING_EDITOR } from '@/const';
 
 const defaultPrePostprocessingForm = {
@@ -21,7 +22,8 @@ export default defineComponent({
     name: "mainContent",
     components: {
         MonacoEditor,
-        editorFuncBox
+        editorFuncBox,
+        APIHeader
     },
     setup(props) {
         const route = useRoute();
@@ -30,9 +32,26 @@ export default defineComponent({
         const postprocessingLoading = ref(true);
         const preprocessingEditForm = ref(deepClone(defaultPrePostprocessingForm));
         const postprocessingEditForm = ref(deepClone(defaultPrePostprocessingForm));
+        const excuteResultEditForm = ref(null);
         const preprocessingEditorRef: any = ref(null);
         const postprocessingEditorRef: any = ref(null);
+        const excuteResultEditorRef: any = ref(null);
+
+        const activeTab = ref('headers');
+
+        /**
+         * API response data
+         */
         const APIInfo: any = ref({});
+        const APIHeaders = ref([]);
+
+
+        /**
+         * component show status
+         */
+        const isShowPreprocessingEditor = ref(false);
+        const isShowPostprocessingEditor = ref(false);
+        const isShowExcuteResultEditor = ref(false);
 
         const getMethodStyles = (method: string) => {
             const styles = {
@@ -67,11 +86,33 @@ export default defineComponent({
             ElMessage.success(`复制${type === 'preprocessing' ? '预处理' : '后处理'}函数成功`);
         };
 
-        const fullPage = (type: 'preprocessing' | 'postprocessing') => {
+        const handleFullPage = (type: 'preprocessing' | 'postprocessing') => {
             ElMessage.success(`全屏${type === 'preprocessing' ? '预处理' : '后处理'}函数`);
         };
 
-        const handleSave = (type: 'preprocessing' | 'postprocessing') => {
+        const handleFold = (type: 'preprocessing' | 'postprocessing', isFold: boolean) => {
+            // First collapse the other editors
+            isShowPreprocessingEditor.value = false;
+            isShowPostprocessingEditor.value = false;
+            isShowExcuteResultEditor.value = false;
+
+            const editorMap = {
+                'preprocessing': isShowPreprocessingEditor,
+                'postprocessing': isShowPostprocessingEditor,
+                'excuteResult': isShowExcuteResultEditor
+            };
+            editorMap[type].value = !isFold;
+        };
+
+        const handleRun = (type: 'preprocessing' | 'postprocessing' | 'excuteResult') => {
+            if (type !== 'excuteResult') return;
+            loading.value = true;
+            ElMessage.success('运行成功');
+        };
+
+        const handleSave = (type: 'preprocessing' | 'postprocessing' | 'excuteResult') => {
+            if (type === 'excuteResult') return;
+
             const editorRef = type === 'preprocessing' ? preprocessingEditorRef : postprocessingEditorRef;
             const content = editorRef.value?.getContentValue();
 
@@ -105,8 +146,11 @@ export default defineComponent({
         };
 
         // 抽象处理函数编辑器组件
-        const ProcessingEditor = ({ type, loading, func, editorRef }) => (
-            <div>
+        const ProcessingEditor = ({ type, loading, func, editorRef, isShow }) => (
+            <div class={cn(
+                "transition-all duration-500 ease-in-out",
+                isShow ? "w-full" : "w-10"
+            )}>
                 {/* <div class={cn("text-lg font-semibold mb-4")}>{type}</div> */}
                 <div class={cn(
                     `relative w-full min-h-[${MIN_HEIGHT_PREPROCESSING_EDITOR}px]`,
@@ -136,24 +180,32 @@ export default defineComponent({
                         {!loading.value && (
                             <editorFuncBox
                                 name={type}
-                                paramString="params, utils, plugin"
+                                paramString={type === 'excuteResult' ? '' : 'params, utils, plugin'}
+                                isShowCopy={true}
+                                isShowFullPage={true}
+                                isShowFold={true}
+                                isShowRun={type === 'excuteResult'}
                                 class={cn(
                                     `w-full min-h-[${MIN_HEIGHT_PREPROCESSING_EDITOR}px] rounded-lg overflow-hidden`,
                                     "border border-gray-200 dark:border-gray-700",
                                     "shadow-sm hover:shadow-md",
                                     "transition-shadow duration-300",
                                     "relative",
-                                    "before:absolute before:inset-0",
-                                    "before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent",
-                                    "after:absolute after:inset-0",
-                                    "after:bg-gradient-to-r after:from-transparent after:via-white/10 after:to-transparent",
-                                    "before:-translate-x-full hover:before:translate-x-full",
-                                    "before:transition-transform before:duration-[2s] before:ease-in-out",
-                                    "after:-translate-x-full hover:after:translate-x-full",
-                                    "after:transition-transform after:duration-[2s] after:ease-in-out after:delay-500"
+                                    isShow ? "before:absolute before:inset-0" : "",
+                                    isShow ? "before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent" : "",
+                                    isShow ? "after:absolute after:inset-0" : "",
+                                    isShow ? "after:bg-gradient-to-r after:from-transparent after:via-white/10 after:to-transparent" : "",
+                                    isShow ? "before:-translate-x-full hover:before:translate-x-full" : "",
+                                    isShow ? "before:transition-transform before:duration-[2s] before:ease-in-out" : "",
+                                    isShow ? "after:-translate-x-full hover:after:translate-x-full" : "",
+                                    isShow ? "after:transition-transform after:duration-[2s] after:ease-in-out after:delay-500" : "",
                                 )}
+                                isFold={!isShow}
                                 onOnCopy={() => handleCopy(type)}
-                                onOnFullPage={() => fullPage(type)}
+                                onOnFullPage={() => handleFullPage(type)}
+                                onOnFold={(isFold: boolean) => handleFold(type, isFold)}
+                                onOnRun={() => handleRun(type)}
+                                height={MIN_HEIGHT_PREPROCESSING_EDITOR}
                             >
                                 <MonacoEditor
                                     ref={editorRef}
@@ -171,6 +223,7 @@ export default defineComponent({
                                             handleSave(type);
                                         }
                                     }}
+                                    readOnly={type === 'excuteResult'}
                                 />
                             </editorFuncBox>
                         )}
@@ -216,6 +269,12 @@ export default defineComponent({
                 setTimeout(() => {
                     postprocessingLoading.value = false;
                 }, 1000);
+            });
+
+            APIs._APIModuleBindRequest({ apiModuleId: route.query.id as string }).then((res: any) => {
+                if (res.code === 200) {
+                    APIHeaders.value = JSON.parse(res.data.headerSchema);
+                }   
             });
         });
 
@@ -270,24 +329,82 @@ export default defineComponent({
                             <span>{new Date(APIInfo.value?.updatedAt).toLocaleString()}</span>
                         </div>
                     </div>
-                    {/* 前后置函数部分 */}
-                    <div class={cn("mt-8 grid grid-cols-2 gap-4")}>
-                        {/* 前置函数 */}
-                        <ProcessingEditor
-                            type="preprocessing"
-                            editorRef={preprocessingEditorRef}
-                            loading={preprocessingLoading}
-                            func={preprocessingEditForm.value.logic}
-                        />
 
-                        {/* 后置函数 */}
-                        <ProcessingEditor
-                            type="postprocessing"
-                            editorRef={postprocessingEditorRef}
-                            loading={postprocessingLoading}
-                            func={postprocessingEditForm.value.logic}
-                        />
+                    {/* 请求头和参数切换部分 */}
+                    <div class={cn("mt-8")}>
+                        <div class={cn("flex border-b border-gray-200 dark:border-gray-700")}>
+                            {['headers', 'params', 'Processing Function'].map(tab => (
+                                <div
+                                    class={cn(
+                                        "px-4 py-2 cursor-pointer",
+                                        "border-b-2 transition-colors duration-300",
+                                        activeTab.value === tab
+                                            ? "border-blue-500 text-blue-600"
+                                            : "border-transparent hover:border-gray-300"
+                                    )}
+                                    onClick={() => activeTab.value = tab}
+                                >
+                                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                                </div>
+                            ))}
+                        </div>
+
+                        <div>
+                            {activeTab.value === 'headers' && (
+                                <div class={cn("p-4")}>
+                                    <div class={cn("text-lg font-bold")}>
+                                        <APIHeader
+                                            headers={APIHeaders.value}
+                                            on
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                            {activeTab.value === 'params' && (
+                                <div class={cn("p-4")}>
+                                    <div class={cn("text-lg font-bold")}>Request Params Content</div>
+                                </div>
+                            )}
+                            {activeTab.value === 'Processing Function' && (
+                                <div class={cn("p-4")}>
+                                    {/* <div class={cn("text-lg font-bold")}>Processing Function Content</div> */}
+                                    {/* 前后置函数部分 */}
+                                    <div class={cn("flex gap-4")}>
+                                        {/* 前置函数 */}
+                                        <ProcessingEditor
+                                            type="preprocessing"
+                                            editorRef={preprocessingEditorRef}
+                                            loading={preprocessingLoading}
+                                            func={preprocessingEditForm.value.logic}
+                                            isShow={isShowPreprocessingEditor.value}
+                                        />
+
+                                        {/* 后置函数 */}
+                                        <ProcessingEditor
+                                            type="postprocessing"
+                                            editorRef={postprocessingEditorRef}
+                                            loading={postprocessingLoading}
+                                            func={postprocessingEditForm.value.logic}
+                                            isShow={isShowPostprocessingEditor.value}
+                                        />
+
+                                        {/* 结果预览 */}
+                                        <ProcessingEditor
+                                            type="excuteResult"
+                                            editorRef={excuteResultEditorRef}
+                                            loading={postprocessingLoading}
+                                            func={excuteResultEditForm.value}
+                                            isShow={isShowExcuteResultEditor.value}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
+
+
+
+
                 </div>
 
                 {/* Loading */}

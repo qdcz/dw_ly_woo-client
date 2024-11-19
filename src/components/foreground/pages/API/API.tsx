@@ -77,7 +77,7 @@ export default defineComponent({
                 {/* Search & Filter Bar */}
 
                 {/* API Cards Grid */}
-                <div class={cn("grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3")} onClick={trigger}>
+                <div class={cn("grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 select-none")} onClick={trigger}>
                     {/* API Cards */}
                     {tableData.value?.map((api: IAPI) => (
                         <div data-id={api.id} class={cn(

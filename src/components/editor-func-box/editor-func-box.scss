@@ -26,6 +26,21 @@
     &>.header {
         padding-left: 20px;
         font-weight: 900;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-right: 10px;
+
+        & .btn {
+            cursor: pointer;
+            transition: color .3s;
+            pointer-events: auto;
+        }
+
+        & .btn:hover {
+            color: rgb(40, 181, 221);
+        }
     }
 
     &>.footer {
@@ -46,5 +61,16 @@
         & .btn:hover {
             color: rgb(40, 181, 221);
         }
+    }
+
+    // 折叠封面
+    & .foldCover {
+        display: flex;
+        justify-content: center;
+        cursor: pointer;
+        writing-mode: vertical-rl;
+        // text-orientation: upright;
+        text-align: center;
+        padding: 0 10px;
     }
 }

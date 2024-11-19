@@ -1,4 +1,13 @@
-import { APIModuleList, APIModuleInfo, GetAPIModuleHook, APIModuleAddHook, UpdateAPIModuleHook } from '@/api';
+import {
+    APIModuleList,
+    APIModuleInfo,
+    GetAPIModuleHook,
+    APIModuleAddHook,
+    UpdateAPIModuleHook,
+    APIModuleBindRequest,
+    UpdateAPIModuleBindRequest,
+    AddAPIModuleBindRequest
+} from '@/api';
 
 
 // 获取API模块列表
@@ -41,12 +50,28 @@ const _UpdateAPIModuleHook = (params) => {
     return UpdateAPIModuleHook(params.id, params.data)
 };
 
-// 更新API
+// 查询API请求头
+const _APIModuleBindRequest = (params) => {
+    return APIModuleBindRequest(params)
+};
+
+// 更新API请求头
+const _UpdateAPIModuleBindRequest = (params) => {
+    return UpdateAPIModuleBindRequest(params.id, params.data)
+};
+
+// 新增API请求头
+const _AddAPIModuleBindRequest = (params) => {
+    return AddAPIModuleBindRequest(params)
+};
 
 export default {
     _APIModuleList,
     _APIInfo,
     _GetAPIModuleHook,
     _APIModuleAddHook,
-    _UpdateAPIModuleHook
+    _UpdateAPIModuleHook,
+    _APIModuleBindRequest,
+    _UpdateAPIModuleBindRequest,
+    _AddAPIModuleBindRequest
 }
