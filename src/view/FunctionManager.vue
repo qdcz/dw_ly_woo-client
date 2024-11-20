@@ -45,7 +45,7 @@
                         @itemAdd='functionParamsItemAdd' @itemDelete='functionParamsItemDelete'></RequestParams>
                 </el-form-item>
                 <el-form-item label="代码" prop="logic">
-                    <editorFuncBox :name="editForm.name" :params="editForm._params" @onCopy="handleCopy"
+                    <editorFuncBox :name="editForm.name" :params="editForm._params" @onCopy="handleCopy" :isShowCopy="true" :isShowFullPage="true"
                         @onFullPage="fullPage">
                         <MonacoEditor initialLanguage="javascript" ref="FunctionEditor"
                             @contentChange="FunctionEditorContentChange" style="height: 300px;">

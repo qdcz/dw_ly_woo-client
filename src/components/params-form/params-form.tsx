@@ -1,6 +1,5 @@
 import { defineComponent } from "vue";
-import { deepClone, generateString } from "@/utils/index";
-import { Plus, Minus } from '@element-plus/icons-vue';
+import { deepClone } from "@/utils/index";
 import Circle from '@/components/foreground/icon/Circle.tsx';
 import { cn } from '@/utils/index';
 import Select from '@/components/foreground/input/Select.tsx';
@@ -23,7 +22,7 @@ interface ColumnData {
     id?: string;
 }
 
-export const requestFormProps = {
+export const paramsFormProps = {
     title: {
         type: String,
         default: "这是一个标题",
@@ -71,61 +70,39 @@ export default defineComponent({
     name: "ParamsForm",
     emits: [
         "update:modelValue",
-        "formDataChange",
-        "headerItemAdd",
+        "paramsDataChange",
+        "paramsItemAdd",
         "itemAdd",
         "itemDelete",
     ],
     components: {
-        Plus,
-        Minus,
         Circle,
         Select,
         Input
     },
-    props: requestFormProps,
+    props: paramsFormProps,
     setup(props, { emit }) {
-        const emitFormDataChange = () => {
-            emit("formDataChange", props.bodyData);
+        const emitParamsDataChange = () => emit("paramsDataChange", props.bodyData);
+        const header_itemAdd = () => emit("paramsItemAdd");
+        const paramsForm_selectChange = emitParamsDataChange;
+        const paramsForm_checkChange = emitParamsDataChange;
+
+        const itemDelete = function (this: ColumnData[], index: number) {
+            emit("itemDelete", deepClone(this), index);
         };
-
-        const requestForm_selectChange = emitFormDataChange;
-        const requestForm_inputChange = emitFormDataChange;
-        const requestForm_checkChange = emitFormDataChange;
-
-        const header_itemAdd = () => {
-            const id = generateString(36);
-            emit("headerItemAdd", [
-                new Array(props.headerData.length).fill(0).map(() => ({ id }))
-            ]);
-        };
-
-        const itemAdd = function (this: ColumnData[]) {
-            const newData = deepClone(this).map((item: ColumnData) => ({
-                ...item,
-                id: generateString(36)
-            }));
-            emit("itemAdd", newData);
-        };
-
-        const itemDelete = function (this: ColumnData[]) {
-            emit("itemDelete", deepClone(this));
-        };
-
         const renderFormByType = (columnData: ColumnData) => {
             const commonProps = {
-                'v-model': columnData.value,
+                modelValue: columnData.value,
                 placeholder: columnData.placeholder,
             };
 
             switch (columnData.type) {
                 case "input":
                     return (
-                        // <el-input
-                        //     {...commonProps}
-                        //     onChange={() => requestForm_inputChange()}
-                        // />
-                        <Input modelValue={columnData.value} />
+                        <Input {...commonProps} onUpdate:modelValue={(newValue: any) => {
+                            columnData.value = newValue;
+                            emitParamsDataChange();
+                        }} />
                     );
 
                 case "select": {
@@ -140,7 +117,7 @@ export default defineComponent({
                     return (
                         <el-select
                             {...commonProps}
-                            onChange={() => requestForm_selectChange()}
+                            onChange={() => paramsForm_selectChange()}
                         >
                             {options.map(opt => (
                                 <el-option
@@ -158,7 +135,7 @@ export default defineComponent({
                         <el-checkbox
                             v-model={columnData.value}
                             size="large"
-                            onChange={() => requestForm_checkChange()}
+                            onChange={() => paramsForm_checkChange()}
                         />
                     );
 
@@ -169,7 +146,7 @@ export default defineComponent({
 
         return () => (
             <div class={cn("text-sm text-gray-700 dark:text-slate-400")}>
-                {/* 头部标题 */}
+                {/* 头部部分 */}
                 <div class={cn(
                     "flex flex-row items-center w-full font-semibold",
                     "border border-gray-200 dark:border-slate-800",
@@ -194,12 +171,12 @@ export default defineComponent({
                     </div>
                 </div>
 
-                {/* 头部参数 */}
+                {/* 参数部分 */}
                 <div class={cn(
                     "w-full",
                     "border border-gray-200 dark:border-slate-800"
                 )}>
-                    {props.bodyData.map((row) => (
+                    {props.bodyData.map((row, index) => (
                         <div class={cn("flex flex-row items-center")}>
                             {row.map((column, columnIndex) => (
                                 <div
@@ -217,24 +194,9 @@ export default defineComponent({
                                     width="20px"
                                     height="20px"
                                     type="minus"
+                                    onClick={itemDelete.bind(row, index)}
                                 />
                             </div>
-                            {/* <div class={cn("flex justify-center items-center py-1 border-r dark:border-r-slate-800")}>
-                                <el-button
-                                    type="primary"
-                                    circle
-                                    onClick={itemAdd.bind(row)}
-                                >
-                                    <Plus class={cn("w-4 h-4")} />
-                                </el-button>
-                                <el-button
-                                    type="danger"
-                                    circle
-                                    onClick={itemDelete.bind(row)}
-                                >
-                                    <Minus class={cn("w-4 h-4")} />
-                                </el-button>
-                            </div> */}
                         </div>
                     ))}
                 </div>

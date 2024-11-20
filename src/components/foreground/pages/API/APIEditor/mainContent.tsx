@@ -33,9 +33,14 @@ export default defineComponent({
         const preprocessingEditForm = ref(deepClone(defaultPrePostprocessingForm));
         const postprocessingEditForm = ref(deepClone(defaultPrePostprocessingForm));
         const excuteResultEditForm = ref(null);
+
+        /**
+         * component ref
+         */
         const preprocessingEditorRef: any = ref(null);
         const postprocessingEditorRef: any = ref(null);
         const excuteResultEditorRef: any = ref(null);
+        const APIHeaderRef: any = ref(null);
 
         const activeTab = ref('headers');
 
@@ -43,7 +48,7 @@ export default defineComponent({
          * API response data
          */
         const APIInfo: any = ref({});
-        const APIHeaders = ref([]);
+        const APIHeaders = ref<never[]>([]);
 
 
         /**
@@ -79,6 +84,17 @@ export default defineComponent({
             navigator.clipboard.writeText(text);
             ElMessage.success('已复制到剪贴板');
         };
+
+        const headerDataChange = (val: any, enableHaderRealTimeSync: boolean) => {
+            APIHeaders.value = val;
+
+            if(enableHaderRealTimeSync){
+                
+            }
+
+            // 提交api接口
+            // 判断是否 有requestid    
+        }
 
         const handleCopy = (type: 'preprocessing' | 'postprocessing') => {
             const rowData = type === 'preprocessing' ? preprocessingEditForm : postprocessingEditForm;
@@ -232,7 +248,7 @@ export default defineComponent({
             </div>
         );
 
-        onMounted(() => {
+        onMounted(async () => {
             APIs._APIInfo({ id: route.query.id as string }).then((res: any) => {
                 if (res.code === 200) {
                     APIInfo.value = res.data;
@@ -271,11 +287,7 @@ export default defineComponent({
                 }, 1000);
             });
 
-            APIs._APIModuleBindRequest({ apiModuleId: route.query.id as string }).then((res: any) => {
-                if (res.code === 200 && res.data) {
-                    APIHeaders.value = JSON.parse(res.data.headerSchema);
-                }
-            });
+            APIHeaders.value = await APIs._APIModuleBindRequest({ apiModuleId: route.query.id as string }) as never[];
         });
 
         return () => (
@@ -354,10 +366,9 @@ export default defineComponent({
                                 <div class={cn("p-4")}>
                                     <div class={cn("text-lg font-bold")}>
                                         <APIHeader
+                                            ref={APIHeaderRef}
                                             headers={APIHeaders.value}
-                                            onHeaderDataChange={(e: any) => {
-                                                APIHeaders.value.push(e as never);
-                                            }}
+                                            onHeaderDataChange={headerDataChange}
                                         />
                                     </div>
                                 </div>
@@ -369,7 +380,6 @@ export default defineComponent({
                             )}
                             {activeTab.value === 'Processing Function' && (
                                 <div class={cn("p-4")}>
-                                    {/* <div class={cn("text-lg font-bold")}>Processing Function Content</div> */}
                                     {/* 前后置函数部分 */}
                                     <div class={cn("flex gap-4")}>
                                         {/* 前置函数 */}

@@ -52,7 +52,36 @@ const _UpdateAPIModuleHook = (params) => {
 
 // 查询API请求头
 const _APIModuleBindRequest = (params) => {
-    return APIModuleBindRequest(params)
+    return new Promise((resolve) => {
+        APIModuleBindRequest(params).then((res: any) => {
+            if (res.code === 200 && res.data) {
+                resolve(JSON.parse(res.data.headerSchema).map(i => {
+                    return [
+                        {
+                            type: "input",
+                            placeholder: "请输入自定义字段-键名",
+                            value: i.key,
+                            id: i.id,
+                        },
+                        {
+                            type: "input",
+                            placeholder: "请输入自定义字段-键值",
+                            value: i.value,
+                            id: i.id,
+                        },
+                        {
+                            type: "input",
+                            placeholder: "字段说明",
+                            value: i.info,
+                            id: i.id,
+                        },
+                    ];
+                }))
+            } else {
+                resolve([])
+            }
+        })
+    })
 };
 
 // 更新API请求头

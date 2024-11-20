@@ -22,11 +22,12 @@ export default defineComponent({
             default: false
         }
     },
-    emits: ['update:modelValue'],
+    emits: ['dataChange', "update:modelValue"],
     setup(props, { emit }) {
         const handleInput = (event: Event) => {
             const target = event.target as HTMLInputElement;
             emit('update:modelValue', target.value);
+            emit('dataChange', target.value);
         };
 
         return () => (

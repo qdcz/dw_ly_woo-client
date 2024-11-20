@@ -20,6 +20,9 @@ export const toggleDarkMode = (theme: string = 'light') => {
 // 初始化主题（可以放在应用启动时调用）
 export const initTheme = () => {
     const darkMode = localStorage.getItem('darkMode');
+    if (!darkMode) {
+        toggleDarkMode();
+    }
     if (darkMode === 'dark') {
         document.documentElement.classList.add('dark');
     }
