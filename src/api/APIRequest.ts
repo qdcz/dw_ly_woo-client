@@ -11,11 +11,11 @@ export const APIModuleBindRequest = (data: any) => {
 };
 
 // 更
-export const UpdateAPIModuleBindRequest = (id: string, data: any) => {
+export const UpdateAPIModuleRequest = (id: string, data: any) => {
     return request.patch("/apiRequest/" + id, { ...data });
 };
 
 // 增
-export const AddAPIModuleBindRequest = (data: any) => {
+export const AddAPIModuleRequest = (data: any) => {
     return request.post("/apiRequest", { ...data });
 };

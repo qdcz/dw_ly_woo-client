@@ -1,6 +1,6 @@
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, onMounted, Ref, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { cn, deepClone } from '@/utils/index';
+import { cn, deepClone, generateUuid } from '@/utils/index';
 import { API_METHOD, API_STEP } from '@/constants';
 import APIs from '@/components/foreground/pages/API/APIs';
 import { ElMessage } from 'element-plus';
@@ -48,7 +48,9 @@ export default defineComponent({
          * API response data
          */
         const APIInfo: any = ref({});
-        const APIHeaders = ref<never[]>([]);
+        // api请求体信息  包含headerSchema 和 bodySchema
+        const APIRequestBodyInfoInfo = ref<Array<any>>([]);
+        const APIRequestBodyId = ref<string>("");
 
 
         /**
@@ -85,15 +87,55 @@ export default defineComponent({
             ElMessage.success('已复制到剪贴板');
         };
 
-        const headerDataChange = (val: any, enableHaderRealTimeSync: boolean) => {
-            APIHeaders.value = val;
+        const headerDataChange = async (val: any, enableHaderRealTimeSync: Ref<boolean>) => {
+            APIRequestBodyInfoInfo.value = val;
+            if (enableHaderRealTimeSync.value) {
+                const schemas = {
+                    headerSchema: JSON.stringify(
+                        APIRequestBodyInfoInfo.value.map(
+                            (rowData) => {
+                                return {
+                                    id: rowData[0].id || generateUuid(),
+                                    info: rowData[2].value,
+                                    key: rowData[0].value,
+                                    status: 0,
+                                    value: rowData[1].value,
+                                };
+                            }
+                        )
+                    ),
+                    bodySchema: JSON.stringify(
+                        []
+                        // executionCallDialogForm.bodyData_body.map((rowData) => {
+                        //     return {
+                        //         id: rowData[0].id || generateUuid(),
+                        //         type: rowData[1].value,
+                        //         required: rowData[2].value,
+                        //         info: rowData[4].value,
+                        //         key: rowData[0].value,
+                        //         status: 0,
+                        //         value: rowData[3].value,
+                        //     };
+                        // })
+                    ),
+                    querySchema: "[]",
+                };
 
-            if(enableHaderRealTimeSync){
-                
+                if (APIRequestBodyId.value) { // 更新
+                    await APIs._UpdateAPIModuleRequest({
+                        APIRequestId: APIRequestBodyId.value,
+                        schemas
+                    });
+                } else { // 新增
+                    APIs._AddAPIModuleRequest({
+                        apiModuleId: route.query.id,
+                        ...schemas
+                    }).then(() => {
+                        getAPIRequest();
+                    })
+                }
+                ElMessage.success('自动更新成功');
             }
-
-            // 提交api接口
-            // 判断是否 有requestid    
         }
 
         const handleCopy = (type: 'preprocessing' | 'postprocessing') => {
@@ -248,7 +290,18 @@ export default defineComponent({
             </div>
         );
 
-        onMounted(async () => {
+        const getAPIRequest = async () => {
+            const APIModuleBindRequestResult = await APIs._APIModuleBindRequest({ apiModuleId: route.query.id as string }) as {
+                headerSchema: Array<any>;
+                querySchema: Array<any>;
+                bodySchema: Array<any>;
+                id: string
+            };
+            APIRequestBodyInfoInfo.value = APIModuleBindRequestResult.headerSchema;
+            APIRequestBodyId.value = APIModuleBindRequestResult.id
+        }
+
+        onMounted(() => {
             APIs._APIInfo({ id: route.query.id as string }).then((res: any) => {
                 if (res.code === 200) {
                     APIInfo.value = res.data;
@@ -287,7 +340,7 @@ export default defineComponent({
                 }, 1000);
             });
 
-            APIHeaders.value = await APIs._APIModuleBindRequest({ apiModuleId: route.query.id as string }) as never[];
+            getAPIRequest();
         });
 
         return () => (
@@ -367,7 +420,7 @@ export default defineComponent({
                                     <div class={cn("text-lg font-bold")}>
                                         <APIHeader
                                             ref={APIHeaderRef}
-                                            headers={APIHeaders.value}
+                                            headers={APIRequestBodyInfoInfo.value}
                                             onHeaderDataChange={headerDataChange}
                                         />
                                     </div>

@@ -1,5 +1,5 @@
 import { defineComponent } from "vue";
-import { deepClone } from "@/utils/index";
+import { deepClone, throttle } from "@/utils/index";
 import Circle from '@/components/foreground/icon/Circle.tsx';
 import { cn } from '@/utils/index';
 import Select from '@/components/foreground/input/Select.tsx';
@@ -82,7 +82,9 @@ export default defineComponent({
     },
     props: paramsFormProps,
     setup(props, { emit }) {
-        const emitParamsDataChange = () => emit("paramsDataChange", props.bodyData);
+        const emitParamsDataChange = throttle(() => {
+            emit("paramsDataChange", props.bodyData);
+        }, 500);
         const header_itemAdd = () => emit("paramsItemAdd");
         const paramsForm_selectChange = emitParamsDataChange;
         const paramsForm_checkChange = emitParamsDataChange;
@@ -99,10 +101,10 @@ export default defineComponent({
             switch (columnData.type) {
                 case "input":
                     return (
-                        <Input {...commonProps} onUpdate:modelValue={(newValue: any) => {
-                            columnData.value = newValue;
-                            emitParamsDataChange();
-                        }} />
+                        <Input {...commonProps}
+                            onUpdate:modelValue={(newValue: any) => columnData.value = newValue}
+                            onEnterPressed={emitParamsDataChange}
+                        />
                     );
 
                 case "select": {

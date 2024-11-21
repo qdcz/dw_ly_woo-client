@@ -7,7 +7,7 @@ import Switch from '@/components/foreground/input/switch';
 
 export default defineComponent({
     name: 'APIHeader',
-    emits: ['headerDataChange', 'headerParamsDelete', 'headerParamsChange'],
+    emits: ['headerDataChange', 'headerParamsDelete'],
     components: {
         ParamsForm,
         Switch
@@ -37,13 +37,13 @@ export default defineComponent({
                 {
                     type: "input",
                     placeholder: "请输入自定义字段-键值",
-                    value: Math.random(),
+                    value: "value",
                     id
                 },
                 {
                     type: "input",
                     placeholder: "字段说明",
-                    value: "这是一段描述" + Math.random(),
+                    value: "这是一段描述",
                     id
                 },
             ]
@@ -85,7 +85,7 @@ export default defineComponent({
         };
 
         const ParamsDataChange = (data) => {
-            emit('headerParamsChange', data);
+            headerDataBridge.value = data;
         };
 
         return () => (
@@ -103,7 +103,7 @@ export default defineComponent({
                         "text-sm ml-2",
                         "transition-all duration-500",
                         !enableHaderRealTimeSync.value ? "text-gray-300 dark:text-gray-600" : "text-blue-500 dark:text-indigo-50"
-                    )}>保存模式（修改会实时保存至云端）</span>
+                    )}>保存模式（单行增删会实时保存至云端，单列需要回车进行保存）</span>
                 </div>
                 <ParamsForm
                     title="请求头"

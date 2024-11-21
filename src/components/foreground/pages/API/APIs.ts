@@ -5,8 +5,8 @@ import {
     APIModuleAddHook,
     UpdateAPIModuleHook,
     APIModuleBindRequest,
-    UpdateAPIModuleBindRequest,
-    AddAPIModuleBindRequest
+    UpdateAPIModuleRequest,
+    AddAPIModuleRequest
 } from '@/api';
 
 
@@ -55,43 +55,76 @@ const _APIModuleBindRequest = (params) => {
     return new Promise((resolve) => {
         APIModuleBindRequest(params).then((res: any) => {
             if (res.code === 200 && res.data) {
-                resolve(JSON.parse(res.data.headerSchema).map(i => {
-                    return [
-                        {
-                            type: "input",
-                            placeholder: "请输入自定义字段-键名",
-                            value: i.key,
-                            id: i.id,
-                        },
-                        {
-                            type: "input",
-                            placeholder: "请输入自定义字段-键值",
-                            value: i.value,
-                            id: i.id,
-                        },
-                        {
-                            type: "input",
-                            placeholder: "字段说明",
-                            value: i.info,
-                            id: i.id,
-                        },
-                    ];
-                }))
+                resolve({
+                    id: res.data.id,
+                    headerSchema: JSON.parse(res.data.headerSchema).map(i => {
+                        return [
+                            {
+                                type: "input",
+                                placeholder: "请输入自定义字段-键名",
+                                value: i.key,
+                                id: i.id,
+                            },
+                            {
+                                type: "input",
+                                placeholder: "请输入自定义字段-键值",
+                                value: i.value,
+                                id: i.id,
+                            },
+                            {
+                                type: "input",
+                                placeholder: "字段说明",
+                                value: i.info,
+                                id: i.id,
+                            },
+                        ];
+                    }),
+                    querySchema: JSON.parse(res.data.querySchema).map(i => {
+                        return [
+                            {
+                                type: "input",
+                                placeholder: "请输入自定义字段-键名",
+                                value: i.key,
+                                id: i.id,
+                            },
+                            {
+                                type: "input",
+                                placeholder: "请输入自定义字段-键值",
+                                value: i.value,
+                                id: i.id,
+                            },
+                            {
+                                type: "input",
+                                placeholder: "字段说明",
+                                value: i.info,
+                                id: i.id,
+                            },
+                        ];
+                    })
+                })
             } else {
-                resolve([])
+                resolve({
+                    id: null,
+                    data: []
+                })
             }
         })
     })
 };
 
 // 更新API请求头
-const _UpdateAPIModuleBindRequest = (params) => {
-    return UpdateAPIModuleBindRequest(params.id, params.data)
+const _UpdateAPIModuleRequest = (params) => {
+    return UpdateAPIModuleRequest(params.APIRequestId, params.schemas)
 };
 
 // 新增API请求头
-const _AddAPIModuleBindRequest = (params) => {
-    return AddAPIModuleBindRequest(params)
+const _AddAPIModuleRequest = (params) => {
+    return AddAPIModuleRequest({
+        apiModuleId: params.apiModuleId,
+        headerSchema: params.headerSchema,
+        bodySchema: params.bodySchema,
+        querySchema: params.querySchema,
+    })
 };
 
 export default {
@@ -101,6 +134,6 @@ export default {
     _APIModuleAddHook,
     _UpdateAPIModuleHook,
     _APIModuleBindRequest,
-    _UpdateAPIModuleBindRequest,
-    _AddAPIModuleBindRequest
+    _UpdateAPIModuleRequest,
+    _AddAPIModuleRequest
 }

@@ -22,7 +22,7 @@ export default defineComponent({
             default: false
         }
     },
-    emits: ['dataChange', "update:modelValue"],
+    emits: ['dataChange', "update:modelValue", "enterPressed"],
     setup(props, { emit }) {
         const handleInput = (event: Event) => {
             const target = event.target as HTMLInputElement;
@@ -30,11 +30,19 @@ export default defineComponent({
             emit('dataChange', target.value);
         };
 
+        const handleKeyPress = (event: KeyboardEvent) => {
+            if (event.key === 'Enter') {
+                (event.target as HTMLElement).blur();
+                emit('enterPressed');
+            }
+        };
+
         return () => (
             <input
                 type="text"
                 value={props.modelValue}
                 onInput={handleInput}
+                onKeypress={handleKeyPress}
                 placeholder={props.placeholder}
                 disabled={props.disabled}
                 class={cn(

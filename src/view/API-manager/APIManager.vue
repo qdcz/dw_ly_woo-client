@@ -338,8 +338,8 @@ import {
     DeleteAPIModuleDataUnits,
     APIExecutePreview,
     APIModuleBindRequest,
-    UpdateAPIModuleBindRequest,
-    AddAPIModuleBindRequest,
+    UpdateAPIModuleRequest,
+    AddAPIModuleRequest,
     APIModuleAddHook,
     GetAPIModuleHook,
     UpdateAPIModuleHook,
@@ -819,15 +819,15 @@ export default {
             }
         };
 
-        const updateAPIModuleBindRequest = async function (id, params) {
-            const { code, data } = await UpdateAPIModuleBindRequest(id, params);
+        const UpdateAPIModuleRequest = async function (id, params) {
+            const { code, data } = await UpdateAPIModuleRequest(id, params);
             if (code == 200) {
                 ElMessage.success("更新请求体成功！");
             }
         };
 
-        const addAPIModuleBindRequest = async function (params) {
-            const { code, data } = await AddAPIModuleBindRequest(params);
+        const AddAPIModuleRequest = async function (params) {
+            const { code, data } = await AddAPIModuleRequest(params);
             if (code == 200) {
                 ElMessage.success("新增请求体成功！");
             }
@@ -1238,7 +1238,7 @@ export default {
 
                 // 如果 executionCallDialogForm.requestId 不存在 表示要使用新增接口
                 if (executionCallDialogForm.requestId) {
-                    updateAPIModuleBindRequest(
+                    UpdateAPIModuleRequest(
                         executionCallDialogForm.requestId,
                         schemas
                     )
@@ -1253,7 +1253,7 @@ export default {
                     return;
                 }
 
-                addAPIModuleBindRequest({
+                AddAPIModuleRequest({
                     apiModuleId: executionCallDialogForm.apiId,
                     ...schemas,
                 })
