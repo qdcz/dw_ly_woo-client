@@ -8,6 +8,7 @@ import { ElMessage } from 'element-plus';
 import MonacoEditor from '@/components/monaco.vue';
 import editorFuncBox from '@/components/editor-func-box/index.jsx';
 import APIHeader from './APIHeader';
+import APIBody from './APIBody';
 import { LEFT_SIDEBAR_WIDTH, MIN_HEIGHT_PREPROCESSING_EDITOR } from '@/const';
 
 const defaultPrePostprocessingForm = {
@@ -23,7 +24,8 @@ export default defineComponent({
     components: {
         MonacoEditor,
         editorFuncBox,
-        APIHeader
+        APIHeader,
+        APIBody
     },
     setup(props) {
         const route = useRoute();
@@ -40,7 +42,6 @@ export default defineComponent({
         const preprocessingEditorRef: any = ref(null);
         const postprocessingEditorRef: any = ref(null);
         const excuteResultEditorRef: any = ref(null);
-        const APIHeaderRef: any = ref(null);
 
         const activeTab = ref('headers');
 
@@ -49,7 +50,8 @@ export default defineComponent({
          */
         const APIInfo: any = ref({});
         // api请求体信息  包含headerSchema 和 bodySchema
-        const APIRequestBodyInfoInfo = ref<Array<any>>([]);
+        const APIRequestHeaderInfo = ref<Array<any>>([]);
+        const APIRequestBodyInfo = ref<Array<any>>([]);
         const APIRequestBodyId = ref<string>("");
 
 
@@ -87,12 +89,14 @@ export default defineComponent({
             ElMessage.success('已复制到剪贴板');
         };
 
-        const headerDataChange = async (val: any, enableHaderRealTimeSync: Ref<boolean>) => {
-            APIRequestBodyInfoInfo.value = val;
+        const paramsDataChange = async (type: string, val: any, enableHaderRealTimeSync: Ref<boolean>) => {
+            type == 'headers' ? APIRequestHeaderInfo.value = val : "";
+            type == 'bodys' ? APIRequestBodyInfo.value = val : "";
+
             if (enableHaderRealTimeSync.value) {
                 const schemas = {
                     headerSchema: JSON.stringify(
-                        APIRequestBodyInfoInfo.value.map(
+                        APIRequestHeaderInfo.value.map(
                             (rowData) => {
                                 return {
                                     id: rowData[0].id || generateUuid(),
@@ -105,18 +109,17 @@ export default defineComponent({
                         )
                     ),
                     bodySchema: JSON.stringify(
-                        []
-                        // executionCallDialogForm.bodyData_body.map((rowData) => {
-                        //     return {
-                        //         id: rowData[0].id || generateUuid(),
-                        //         type: rowData[1].value,
-                        //         required: rowData[2].value,
-                        //         info: rowData[4].value,
-                        //         key: rowData[0].value,
-                        //         status: 0,
-                        //         value: rowData[3].value,
-                        //     };
-                        // })
+                        APIRequestBodyInfo.value.map((rowData) => {
+                            return {
+                                id: rowData[0].id || generateUuid(),
+                                type: rowData[1].value,
+                                required: rowData[2].value,
+                                info: rowData[4].value,
+                                key: rowData[0].value,
+                                status: 0,
+                                value: rowData[3].value,
+                            };
+                        })
                     ),
                     querySchema: "[]",
                 };
@@ -297,7 +300,8 @@ export default defineComponent({
                 bodySchema: Array<any>;
                 id: string
             };
-            APIRequestBodyInfoInfo.value = APIModuleBindRequestResult.headerSchema;
+            APIRequestHeaderInfo.value = APIModuleBindRequestResult.headerSchema;
+            APIRequestBodyInfo.value = APIModuleBindRequestResult.bodySchema;
             APIRequestBodyId.value = APIModuleBindRequestResult.id
         }
 
@@ -419,16 +423,24 @@ export default defineComponent({
                                 <div class={cn("p-4")}>
                                     <div class={cn("text-lg font-bold")}>
                                         <APIHeader
-                                            ref={APIHeaderRef}
-                                            headers={APIRequestBodyInfoInfo.value}
-                                            onHeaderDataChange={headerDataChange}
+                                            headers={APIRequestHeaderInfo.value}
+                                            onHeaderDataChange={(val: any[], enableHaderRealTimeSync: Ref<boolean>) => {
+                                                paramsDataChange("headers", val, enableHaderRealTimeSync)
+                                            }}
                                         />
                                     </div>
                                 </div>
                             )}
                             {activeTab.value === 'params' && (
                                 <div class={cn("p-4")}>
-                                    <div class={cn("text-lg font-bold")}>Request Params Content</div>
+                                    <div class={cn("text-lg font-bold")}>
+                                        <APIBody
+                                            params={APIRequestBodyInfo.value}
+                                            onParamsChange={(val: any[], enableHaderRealTimeSync: Ref<boolean>) => {
+                                                paramsDataChange("bodys", val, enableHaderRealTimeSync)
+                                            }}
+                                        />
+                                    </div>
                                 </div>
                             )}
                             {activeTab.value === 'Processing Function' && (

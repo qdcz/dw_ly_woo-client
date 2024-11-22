@@ -30,6 +30,18 @@ export default defineComponent({
             emit('dataChange', target.value);
         };
 
+        const handleFocus = (event: FocusEvent) => {
+            (event.target as HTMLElement).classList.add('shadow-dwly_inputActive');
+            if (document.documentElement.classList.contains('dark')) {
+                (event.target as HTMLElement).classList.add('shadow-dwly_inputActive__dark');
+            }
+        };
+
+        const handleBlur = (event: FocusEvent) => {
+            (event.target as HTMLElement).classList.remove('shadow-dwly_inputActive');
+            (event.target as HTMLElement).classList.remove('shadow-dwly_inputActive__dark');
+        };
+
         const handleKeyPress = (event: KeyboardEvent) => {
             if (event.key === 'Enter') {
                 (event.target as HTMLElement).blur();
@@ -42,13 +54,16 @@ export default defineComponent({
                 type="text"
                 value={props.modelValue}
                 onInput={handleInput}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
                 onKeypress={handleKeyPress}
                 placeholder={props.placeholder}
                 disabled={props.disabled}
                 class={cn(
-                    "w-full h-full px-3 py-1.5 text-sm outline-none",
-                    "bg-transparent",
+                    "w-full h-full px-3 py-1.5 text-sm rounded",
+                    "outline-none border-0 bg-transparent", // 消除默认边框和背景样式
                     "text-gray-800 dark:text-gray-200",
+                    "transition duration-200 ease-in",
                     props.disabled && "opacity-50 cursor-not-allowed",
                     !props.disabled && "cursor-text",
                     "placeholder:text-gray-400 dark:placeholder:text-gray-500",

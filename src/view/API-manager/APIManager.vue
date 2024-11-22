@@ -819,14 +819,14 @@ export default {
             }
         };
 
-        const UpdateAPIModuleRequest = async function (id, params) {
+        const _UpdateAPIModuleRequest = async function (id, params) {
             const { code, data } = await UpdateAPIModuleRequest(id, params);
             if (code == 200) {
                 ElMessage.success("更新请求体成功！");
             }
         };
 
-        const AddAPIModuleRequest = async function (params) {
+        const _AddAPIModuleRequest = async function (params) {
             const { code, data } = await AddAPIModuleRequest(params);
             if (code == 200) {
                 ElMessage.success("新增请求体成功！");
@@ -1238,7 +1238,7 @@ export default {
 
                 // 如果 executionCallDialogForm.requestId 不存在 表示要使用新增接口
                 if (executionCallDialogForm.requestId) {
-                    UpdateAPIModuleRequest(
+                    _UpdateAPIModuleRequest(
                         executionCallDialogForm.requestId,
                         schemas
                     )
@@ -1253,7 +1253,7 @@ export default {
                     return;
                 }
 
-                AddAPIModuleRequest({
+                _AddAPIModuleRequest({
                     apiModuleId: executionCallDialogForm.apiId,
                     ...schemas,
                 })

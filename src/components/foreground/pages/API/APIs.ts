@@ -55,6 +55,7 @@ const _APIModuleBindRequest = (params) => {
     return new Promise((resolve) => {
         APIModuleBindRequest(params).then((res: any) => {
             if (res.code === 200 && res.data) {
+                // 在返回数据的时候将数据转成前端params表单需要的格式
                 resolve({
                     id: res.data.id,
                     headerSchema: JSON.parse(res.data.headerSchema).map(i => {
@@ -79,28 +80,41 @@ const _APIModuleBindRequest = (params) => {
                             },
                         ];
                     }),
-                    querySchema: JSON.parse(res.data.querySchema).map(i => {
+                    bodySchema: JSON.parse(res.data.bodySchema).map(i => {
                         return [
                             {
                                 type: "input",
-                                placeholder: "请输入自定义字段-键名",
+                                placeholder: "请输入入参名",
                                 value: i.key,
                                 id: i.id,
                             },
                             {
+                                type: "select",
+                                placeholder: "请选择字段类型",
+                                value: i.type,
+                                id: i.id,
+                            },
+                            {
+                                type: "checkbox",
+                                placeholder: "是否必传",
+                                value: i.require,
+                                id: i.id,
+                            },
+                            {
                                 type: "input",
-                                placeholder: "请输入自定义字段-键值",
+                                placeholder: "请输入示例值",
                                 value: i.value,
                                 id: i.id,
                             },
                             {
                                 type: "input",
-                                placeholder: "字段说明",
+                                placeholder: "请输入入参描述",
                                 value: i.info,
                                 id: i.id,
                             },
                         ];
-                    })
+                    }),
+                    querySchema: []
                 })
             } else {
                 resolve({

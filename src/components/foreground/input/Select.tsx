@@ -68,8 +68,8 @@ export default defineComponent({
                     type="button"
                     onClick={toggleDropdown}
                     class={cn(
-                        "min-w-28 px-3 py-1.5 text-left rounded text-sm",
-                        "bg-white dark:bg-gray-800",
+                        "min-w-28 w-full h-full px-3 py-1.5 text-left rounded text-sm",
+                        "bg-white dark:bg-transparent",
                         props.bordered && "border border-gray-200 dark:border-gray-700",
                         "text-gray-800 dark:text-gray-200",
                         "hover:bg-gray-50 dark:hover:bg-gray-750",
@@ -103,6 +103,8 @@ export default defineComponent({
                     </svg>
                 </button>
 
+
+                {/** drop down list */}
                 <Transition
                     enterActiveClass="transition duration-200 ease-out"
                     enterFromClass="transform opacity-0 -translate-y-2"
@@ -116,7 +118,8 @@ export default defineComponent({
                             "absolute z-10 w-full mt-1 rounded shadow-sm",
                             "bg-white dark:bg-gray-800",
                             "border border-gray-200 dark:border-gray-700",
-                            "text-sm"
+                            "text-sm",
+                            "w-28 w-full"
                         )}>
                             {props.options.map((option) => (
                                 <div

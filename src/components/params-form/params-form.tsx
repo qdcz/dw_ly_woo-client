@@ -70,8 +70,7 @@ export default defineComponent({
     name: "ParamsForm",
     emits: [
         "update:modelValue",
-        "paramsDataChange",
-        "paramsItemAdd",
+        "paramsChange",
         "itemAdd",
         "itemDelete",
     ],
@@ -83,9 +82,9 @@ export default defineComponent({
     props: paramsFormProps,
     setup(props, { emit }) {
         const emitParamsDataChange = throttle(() => {
-            emit("paramsDataChange", props.bodyData);
+            emit("paramsChange", props.bodyData);
         }, 500);
-        const header_itemAdd = () => emit("paramsItemAdd");
+        const header_itemAdd = () => emit("itemAdd");
         const paramsForm_selectChange = emitParamsDataChange;
         const paramsForm_checkChange = emitParamsDataChange;
 
@@ -97,7 +96,6 @@ export default defineComponent({
                 modelValue: columnData.value,
                 placeholder: columnData.placeholder,
             };
-
             switch (columnData.type) {
                 case "input":
                     return (
@@ -115,7 +113,7 @@ export default defineComponent({
                         { key: "Object", label: "Object", value: "Object" },
                         { key: "Boolean", label: "Boolean", value: "Boolean" }
                     ];
-
+                    return <Select options={options} />
                     return (
                         <el-select
                             {...commonProps}
@@ -133,13 +131,13 @@ export default defineComponent({
                 }
 
                 case "checkbox":
-                    return (
-                        <el-checkbox
-                            v-model={columnData.value}
-                            size="large"
-                            onChange={() => paramsForm_checkChange()}
-                        />
-                    );
+                // return (
+                //     <el-checkbox
+                //         v-model={columnData.value}
+                //         size="large"
+                //         onChange={() => paramsForm_checkChange()}
+                //     />
+                // );
 
                 default:
                     return null;
@@ -151,7 +149,10 @@ export default defineComponent({
                 {/* 头部部分 */}
                 <div class={cn(
                     "flex flex-row items-center w-full font-semibold",
-                    "border border-gray-200 dark:border-slate-800",
+                    // "ra"
+                    // "border border-gray-200 dark:border-slate-800",
+                    "shadow-dwly_border"
+                    // ""
                 )}>
                     {props.headerData.map((header) => (
                         <div
@@ -179,7 +180,7 @@ export default defineComponent({
                     "border border-gray-200 dark:border-slate-800"
                 )}>
                     {props.bodyData.map((row, index) => (
-                        <div class={cn("flex flex-row items-center")}>
+                        <div class={cn("flex flex-row items-center h-[30px]")}>
                             {row.map((column, columnIndex) => (
                                 <div
                                     class={cn("border-r dark:border-r-slate-800")}

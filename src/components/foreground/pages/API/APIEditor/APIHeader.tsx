@@ -54,14 +54,7 @@ export default defineComponent({
 
         const headerDataBridge = computed({
             get: () => {
-                return props.headers.map(
-                    (i: any) => {
-                        return i.map((item) => {
-                            item.type = 'input';
-                            return item
-                        })
-                    }
-                );
+                return props.headers
             },
             set: (val) => {
                 emit('headerDataChange', val, enableHaderRealTimeSync);
@@ -109,9 +102,9 @@ export default defineComponent({
                     title="请求头"
                     headerData={headerData}
                     bodyData={headerDataBridge.value}
-                    onParamsItemAdd={AddHeaderParams}
+                    onItemAdd={AddHeaderParams}
                     onItemDelete={DeleteHeaderParams}
-                    onParamsDataChange={ParamsDataChange}
+                    onParamsChange={ParamsDataChange}
                 />
             </div>
         );
