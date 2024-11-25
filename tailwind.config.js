@@ -8,9 +8,10 @@ export default {
                 100: "100",
             },
             boxShadow: {
-                "dwly_border":"0 0 1px 1px #e7e7e7",
-                "dwly_inputActive": "0px 0px 2px 1px #3b82f6",
-                "dwly_inputActive__dark": "0px 0px 2px 1px #c8d7ef"
+                "ly_border": "0 0 1px 0px #efefef",
+                "ly_border_dark": "0 0 2px 0px #3d3d3d",
+                "ly_inputActive": "0px 0px 2px 1px #3b82f6",
+                "ly_inputActive__dark": "0px 0px 2px 1px #c8d7ef"
             }
         },
     },

@@ -1,5 +1,8 @@
 const EXPIRE_KEY_SUFFIX = "_expiresIn";
 
+/**
+ * localStorage 操作
+ */
 export const ly_LocalStorage = {
     set(key: string, value: string, expire?: number) {
         localStorage.setItem(key, JSON.stringify(value));
@@ -11,6 +14,11 @@ export const ly_LocalStorage = {
             );
         }
     },
+    /**
+     * 获取localStorage
+     * @param key 需要获取的key
+     * @returns 获取到的值
+     */
     get(key: string) {
         const expireTime = JSON.parse(
             localStorage.getItem(key + EXPIRE_KEY_SUFFIX) as string
@@ -21,6 +29,10 @@ export const ly_LocalStorage = {
         }
         return JSON.parse(localStorage.getItem(key) as string);
     },
+    /**
+     * 删除localStorage
+     * @param key 需要删除的key
+     */
     remove(key: string) {
         localStorage.removeItem(key);
         localStorage.removeItem(key + EXPIRE_KEY_SUFFIX);

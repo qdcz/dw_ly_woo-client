@@ -6,3 +6,4 @@ export * from "./date";
 export * from "./other";
 export * from "./minio";
 export * from './tailwindcss';
+export * from './monaco';

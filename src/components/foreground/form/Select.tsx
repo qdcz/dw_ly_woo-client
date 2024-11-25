@@ -1,5 +1,5 @@
 import { computed, defineComponent, ref, Transition, onMounted, onUnmounted } from 'vue';
-import { cn } from '../../../utils/tailwindcss';
+import { cn } from '@/utils/tailwindcss';
 
 export default defineComponent({
     name: "Select",
@@ -63,20 +63,22 @@ export default defineComponent({
         };
 
         return () => (
-            <div ref={selectRef} class="relative">
+            <div ref={selectRef} class="relative w-full">
                 <button
                     type="button"
                     onClick={toggleDropdown}
                     class={cn(
-                        "min-w-28 w-full h-full px-3 py-1.5 text-left rounded text-sm",
+                        "flex items-center justify-between",
+                        "w-full h-full px-3 py-1.5 text-left rounded text-sm",
                         "bg-white dark:bg-transparent",
-                        props.bordered && "border border-gray-200 dark:border-gray-700",
                         "text-gray-800 dark:text-gray-200",
                         "hover:bg-gray-50 dark:hover:bg-gray-750",
+                        props.bordered && "border border-gray-200 dark:border-gray-700",
                         props.bordered && "focus:outline-none focus:ring-1 focus:ring-blue-400",
                         props.disabled && "opacity-50 cursor-not-allowed",
                         !props.disabled && "cursor-pointer",
-                        "flex items-center justify-between"
+                        "transition duration-200 ease-in",
+                        !isOpen.value ? "" : `shadow-ly_inputActive dark:shadow-ly_inputActive__dark`
                     )}
                 >
                     <span class={cn(
@@ -119,7 +121,7 @@ export default defineComponent({
                             "bg-white dark:bg-gray-800",
                             "border border-gray-200 dark:border-gray-700",
                             "text-sm",
-                            "w-28 w-full"
+                            "w-full"
                         )}>
                             {props.options.map((option) => (
                                 <div

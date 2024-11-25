@@ -1,15 +1,13 @@
 import { defineComponent, onMounted, Ref, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { cn, deepClone, generateUuid } from '@/utils/index';
-import { API_METHOD, API_STEP } from '@/constants';
+import { cn, convertBooleanNumber, convertMonacoValue, deepClone, generateUuid } from '@/utils/index';
+import { LEFT_SIDEBAR_WIDTH, MIN_HEIGHT_PREPROCESSING_EDITOR, API_METHOD, API_STEP } from '@/constants';
 import APIs from '@/components/foreground/pages/API/APIs';
 import { ElMessage } from 'element-plus';
-
 import MonacoEditor from '@/components/monaco.vue';
 import editorFuncBox from '@/components/editor-func-box/index.jsx';
 import APIHeader from './APIHeader';
 import APIBody from './APIBody';
-import { LEFT_SIDEBAR_WIDTH, MIN_HEIGHT_PREPROCESSING_EDITOR } from '@/const';
 
 const defaultPrePostprocessingForm = {
     id: '',
@@ -34,7 +32,7 @@ export default defineComponent({
         const postprocessingLoading = ref(true);
         const preprocessingEditForm = ref(deepClone(defaultPrePostprocessingForm));
         const postprocessingEditForm = ref(deepClone(defaultPrePostprocessingForm));
-        const excuteResultEditForm = ref(null);
+        const excuteResultEditForm = ref<string | null>(null);
 
         /**
          * component ref
@@ -53,6 +51,7 @@ export default defineComponent({
         const APIRequestHeaderInfo = ref<Array<any>>([]);
         const APIRequestBodyInfo = ref<Array<any>>([]);
         const APIRequestBodyId = ref<string>("");
+        const projectInfo = ref<any>(null);
 
 
         /**
@@ -60,7 +59,7 @@ export default defineComponent({
          */
         const isShowPreprocessingEditor = ref(false);
         const isShowPostprocessingEditor = ref(false);
-        const isShowExcuteResultEditor = ref(false);
+        const isShowExcuteResultEditor = ref(true);
 
         const getMethodStyles = (method: string) => {
             const styles = {
@@ -165,10 +164,40 @@ export default defineComponent({
             editorMap[type].value = !isFold;
         };
 
-        const handleRun = (type: 'preprocessing' | 'postprocessing' | 'excuteResult') => {
+        const handleRun = async (type: 'preprocessing' | 'postprocessing' | 'excuteResult') => {
             if (type !== 'excuteResult') return;
-            loading.value = true;
-            ElMessage.success('运行成功');
+            try {
+                loading.value = true;
+                if (!projectInfo.value) {
+                    const response: any = await APIs._GetProjectInfo(APIInfo.value.projectId);
+                    if (response.code === 200) {
+                        projectInfo.value = response.data;
+                    }
+                }
+                const eName = projectInfo.value.eName;
+
+                const params = {};
+                const headers = {};
+                if (APIRequestHeaderInfo.value) {
+                    APIRequestHeaderInfo.value.forEach((rowData) => {
+                        headers[rowData[0].value] = rowData[1].value;
+                    });
+                }
+                if (APIRequestBodyInfo.value) {
+                    APIRequestBodyInfo.value.forEach((rowData) => {
+                        params[rowData[0].value] = convertBooleanNumber(rowData[3].value);
+                    });
+                }
+                const response: any = await APIs._APIExecutePreview(eName, APIInfo.value.id, params, headers);
+                if (response.code === 200) {
+                    excuteResultEditForm.value = convertMonacoValue(response.data).content;
+                }
+                ElMessage.success('运行成功');
+            } catch (e) {
+                console.error("运行失败", e);
+            } finally {
+                loading.value = false;
+            }
         };
 
         const handleSave = (type: 'preprocessing' | 'postprocessing' | 'excuteResult') => {

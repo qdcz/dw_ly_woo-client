@@ -6,7 +6,9 @@ import {
     UpdateAPIModuleHook,
     APIModuleBindRequest,
     UpdateAPIModuleRequest,
-    AddAPIModuleRequest
+    AddAPIModuleRequest,
+    GetProjectInfo,
+    APIExecutePreview
 } from '@/api';
 
 
@@ -97,7 +99,7 @@ const _APIModuleBindRequest = (params) => {
                             {
                                 type: "checkbox",
                                 placeholder: "是否必传",
-                                value: i.require,
+                                value: i.required,
                                 id: i.id,
                             },
                             {
@@ -141,6 +143,16 @@ const _AddAPIModuleRequest = (params) => {
     })
 };
 
+// 获取项目信息
+const _GetProjectInfo = (projectId: string) => {
+    return GetProjectInfo(projectId)
+};
+
+// 接口调用预览结果
+const _APIExecutePreview = (eName: string, apiId: string, data: any, headers: any) => {
+    return APIExecutePreview(eName, apiId, data, headers)
+};
+
 export default {
     _APIModuleList,
     _APIInfo,
@@ -149,5 +161,7 @@ export default {
     _UpdateAPIModuleHook,
     _APIModuleBindRequest,
     _UpdateAPIModuleRequest,
-    _AddAPIModuleRequest
+    _AddAPIModuleRequest,
+    _GetProjectInfo,
+    _APIExecutePreview
 }

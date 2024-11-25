@@ -1,7 +1,7 @@
 import { computed, defineComponent, ref } from 'vue';
 import ParamsForm from '@/components/params-form/params-form';
 import { cn, deepClone, generateUuid } from '@/utils/index';
-import Switch from '@/components/foreground/input/switch';
+import Switch from '@/components/foreground/form/Switch';
 
 
 

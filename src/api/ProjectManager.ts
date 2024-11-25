@@ -10,6 +10,11 @@ export const ProjectList = (params: any) => {
     return request.get("/project", { params });
 };
 
+// 查 单个项目信息
+export const GetProjectInfo = (projectId: string) => {
+    return request.get("/project/" + projectId);
+};
+
 // 增
 export const AddProject = (data: any) => {
     return request.post("/project", { ...data });

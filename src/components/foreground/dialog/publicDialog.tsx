@@ -1,6 +1,6 @@
 import { defineComponent, Transition } from 'vue';
 import { cn } from '../../../utils/tailwindcss';
-import Select from '../input/Select.tsx';
+import Select from '../form/Select.tsx';
 
 export default defineComponent({
     name: "PublicDialog",

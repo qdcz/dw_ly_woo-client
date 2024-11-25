@@ -1,8 +1,18 @@
+/**
+ * 字符串转数组缓冲区
+ * @param str 需要转换的字符串
+ * @returns 转换后的数组缓冲区
+ */
 export function stringToArrayBuffer(str: string) {
     const encoder = new TextEncoder();
     return encoder.encode(str);
 }
 
+/**
+ * 提取字符串中的键值对
+ * @param str 需要提取的字符串
+ * @returns 提取后的键值对
+ */
 export function extractKeyValuePairs(str: string) {
     const regex = /(\w+)\s*=\s*:(\w+)/g;
     const keyValuePairs = [];
@@ -18,6 +28,11 @@ export function extractKeyValuePairs(str: string) {
     return keyValuePairs;
 }
 
+/**
+ * 生成指定长度的随机字符串
+ * @param length 字符串长度
+ * @returns 生成的随机字符串
+ */
 export function generateString(length: number) {
     let characters =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-";
@@ -29,6 +44,10 @@ export function generateString(length: number) {
     return string_id;
 }
 
+/**
+ * 生成UUID
+ * @returns 生成的UUID
+ */
 export function generateUuid() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         const r = Math.random() * 16 | 0;
@@ -37,6 +56,12 @@ export function generateUuid() {
     });
 }
 
+/**
+ * 模糊查询
+ * @param input 输入的字符串
+ * @param data 需要查询的数据
+ * @returns 查询后的数据
+ */
 export function fuzzyQuery(input: string, data: string[]) {
     const words = input.split(/\s+/);
     const patterns: any = [];
@@ -60,4 +85,13 @@ export function fuzzyQuery(input: string, data: string[]) {
     }
 
     return results;
+}
+
+/**
+ * 将字符串转换为布尔值或数字
+ * @param value 需要转换的字符串
+ * @returns 转换后的布尔值或数字
+ */
+export function convertBooleanNumber(value: string) {
+    return value === 'true' ? true : value === 'false' ? false : isNaN(Number(value)) ? value : Number(value);
 }

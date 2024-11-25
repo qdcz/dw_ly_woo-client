@@ -2,8 +2,9 @@ import { defineComponent } from "vue";
 import { deepClone, throttle } from "@/utils/index";
 import Circle from '@/components/foreground/icon/Circle.tsx';
 import { cn } from '@/utils/index';
-import Select from '@/components/foreground/input/Select.tsx';
-import Input from '@/components/foreground/input/input.tsx';
+import Select from '@/components/foreground/form/Select';
+import Input from '@/components/foreground/form/Input';
+import CheckBox from "@/components/foreground/form/CheckBox";
 
 interface headerData {
     name: string;
@@ -77,7 +78,8 @@ export default defineComponent({
     components: {
         Circle,
         Select,
-        Input
+        Input,
+        CheckBox
     },
     props: paramsFormProps,
     setup(props, { emit }) {
@@ -85,8 +87,6 @@ export default defineComponent({
             emit("paramsChange", props.bodyData);
         }, 500);
         const header_itemAdd = () => emit("itemAdd");
-        const paramsForm_selectChange = emitParamsDataChange;
-        const paramsForm_checkChange = emitParamsDataChange;
 
         const itemDelete = function (this: ColumnData[], index: number) {
             emit("itemDelete", deepClone(this), index);
@@ -113,31 +113,25 @@ export default defineComponent({
                         { key: "Object", label: "Object", value: "Object" },
                         { key: "Boolean", label: "Boolean", value: "Boolean" }
                     ];
-                    return <Select options={options} />
-                    return (
-                        <el-select
-                            {...commonProps}
-                            onChange={() => paramsForm_selectChange()}
-                        >
-                            {options.map(opt => (
-                                <el-option
-                                    key={opt.key}
-                                    label={opt.label}
-                                    value={opt.value}
-                                />
-                            ))}
-                        </el-select>
-                    );
+                    return <Select bordered={false} options={options} {...commonProps} onUpdate:modelValue={(val) => {
+                        columnData.value = val;
+                        emitParamsDataChange()
+                    }} />
                 }
 
                 case "checkbox":
-                // return (
-                //     <el-checkbox
-                //         v-model={columnData.value}
-                //         size="large"
-                //         onChange={() => paramsForm_checkChange()}
-                //     />
-                // );
+                    // TODO  后续封装一下
+                    // return <CheckBox />
+                    return (
+                        <el-checkbox
+                            modelValue={columnData.value}
+                            size="large"
+                            onChange={(val) => {
+                                columnData.value = val;
+                                emitParamsDataChange()
+                            }}
+                        />
+                    );
 
                 default:
                     return null;
@@ -145,19 +139,20 @@ export default defineComponent({
         };
 
         return () => (
-            <div class={cn("text-sm text-gray-700 dark:text-slate-400")}>
+            <div class={cn(
+                "request-params",
+            )}>
                 {/* 头部部分 */}
                 <div class={cn(
-                    "flex flex-row items-center w-full font-semibold",
-                    // "ra"
-                    // "border border-gray-200 dark:border-slate-800",
-                    "shadow-dwly_border"
-                    // ""
+                    "request-params_header",
                 )}>
                     {props.headerData.map((header) => (
                         <div
                             style={{ width: `${header.width}%` }}
-                            class={cn("text-center py-2 border-r dark:border-r-slate-800")}
+                            class={cn(
+                                "text-center py-1",
+                                "shadow-ly_border dark:shadow-ly_border_dark"
+                            )}
                         >
                             {header.name}
                         </div>
@@ -176,14 +171,16 @@ export default defineComponent({
 
                 {/* 参数部分 */}
                 <div class={cn(
-                    "w-full",
-                    "border border-gray-200 dark:border-slate-800"
+                    "request-params_body",
                 )}>
                     {props.bodyData.map((row, index) => (
-                        <div class={cn("flex flex-row items-center h-[30px]")}>
+                        <div class={cn("flex flex-row items-center h-[36px]")}>
                             {row.map((column, columnIndex) => (
                                 <div
-                                    class={cn("border-r dark:border-r-slate-800")}
+                                    class={cn(
+                                        "params_body_column",
+                                        "shadow-ly_border dark:shadow-ly_border_dark"
+                                    )}
                                     style={{
                                         width: `${props.headerData[columnIndex].width}%`
                                     }}
@@ -191,7 +188,7 @@ export default defineComponent({
                                     {renderFormByType(column)}
                                 </div>
                             ))}
-                            <div class={cn("px-2")}>
+                            <div class={cn("h-full flex items-center px-2", "shadow-ly_border dark:shadow-ly_border_dark")}>
                                 <Circle
                                     class={cn("cursor-pointer select-none")}
                                     width="20px"

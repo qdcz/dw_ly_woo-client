@@ -13,3 +13,7 @@ export const API_STEP = {
     5: "已废弃",
 };
 
+
+export const LEFT_SIDEBAR_WIDTH = 60;
+export const MIN_HEIGHT_PREPROCESSING_EDITOR = 400;
+

@@ -8,7 +8,7 @@ import SettingsIcon from "./icon/Settings.tsx";
 import ProjectIcon from "./icon/Project.tsx";
 import DataBaseIcon from "./icon/DataBase.tsx";
 import APIIcon from "./icon/API.tsx";
-import { LEFT_SIDEBAR_WIDTH } from "@/const.ts";
+import { LEFT_SIDEBAR_WIDTH } from "@/constants";
 import { cn } from "@/utils/index";
 
 export default defineComponent({

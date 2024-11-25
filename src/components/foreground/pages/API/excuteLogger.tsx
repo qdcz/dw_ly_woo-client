@@ -1,5 +1,5 @@
 import { defineComponent, reactive } from 'vue';
-import PublicDialog from '../../dialog/publicDialog.tsx';
+import PublicDialog from '@/components/foreground/dialog/publicDialog.tsx';
 
 export default defineComponent({
     props: {

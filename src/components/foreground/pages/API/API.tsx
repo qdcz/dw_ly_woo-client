@@ -1,9 +1,9 @@
 import { defineComponent, onMounted, ref } from 'vue';
 import APIs from './APIs';
 import { API_METHOD, API_STEP } from '@/constants';
-import APIEditDialog from './APIEditDialog.tsx';
 import router from '@/router/index.ts';
 import { cn } from '@/utils/index';
+import OperateList from './OperateList';
 
 interface IAPI {
     id: number;
@@ -17,14 +17,13 @@ interface IAPI {
 export default defineComponent({
     name: "API",
     components: {
-        APIEditDialog
+        OperateList
     },
     setup() {
         const tableData = ref([]);
         const currentPage = ref(1);
         const pageSize = ref(10);
         const total = ref(0);
-        // const isAPIEditOpen = ref(false);
         // const handleCurrentChange = (val: number) => {
         //     currentPage.value = val;
         // };
@@ -44,12 +43,10 @@ export default defineComponent({
             if (target) {
                 const id = target.getAttribute('data-id');
                 if (id) {
-                    // isAPIEditOpen.value = true;
                     router.push(`/APIEditor?id=${id}`);
                 }
             }
         };
-
         onMounted(async () => {
             const res = await APIs._APIModuleList({
                 page: currentPage.value,
@@ -69,9 +66,12 @@ export default defineComponent({
                     <h1 class={cn("text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent")}>
                         API Explorer
                     </h1>
-                    <p class={cn("text-gray-600 dark:text-gray-400 mt-1 text-sm")}>
-                        Discover and manage your API endpoints
-                    </p>
+                    <div class={cn("flex items-center justify-between")}>
+                        <p class={cn("text-gray-600 dark:text-gray-400 mt-1 text-sm")}>
+                            Discover and manage your API endpoints
+                        </p>
+                        <OperateList />
+                    </div>
                 </div>
 
                 {/* Search & Filter Bar */}
@@ -137,8 +137,6 @@ export default defineComponent({
                         </div>
                     ))}
                 </div>
-
-                {/* <APIEditDialog isOpen={isAPIEditOpen.value} onClose={() => isAPIEditOpen.value = false} /> */}
 
                 {/* <el-pagination
                     onCurrentChange={handleCurrentChange}

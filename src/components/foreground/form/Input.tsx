@@ -31,15 +31,15 @@ export default defineComponent({
         };
 
         const handleFocus = (event: FocusEvent) => {
-            (event.target as HTMLElement).classList.add('shadow-dwly_inputActive');
+            (event.target as HTMLElement).classList.add('shadow-ly_inputActive');
             if (document.documentElement.classList.contains('dark')) {
-                (event.target as HTMLElement).classList.add('shadow-dwly_inputActive__dark');
+                (event.target as HTMLElement).classList.add('shadow-ly_inputActive__dark');
             }
         };
 
         const handleBlur = (event: FocusEvent) => {
-            (event.target as HTMLElement).classList.remove('shadow-dwly_inputActive');
-            (event.target as HTMLElement).classList.remove('shadow-dwly_inputActive__dark');
+            (event.target as HTMLElement).classList.remove('shadow-ly_inputActive');
+            (event.target as HTMLElement).classList.remove('shadow-ly_inputActive__dark');
         };
 
         const handleKeyPress = (event: KeyboardEvent) => {
