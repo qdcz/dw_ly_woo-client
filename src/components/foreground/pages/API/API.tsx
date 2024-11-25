@@ -47,6 +47,13 @@ export default defineComponent({
                 }
             }
         };
+
+        const handleOperate = (type:string)=>{
+            if(type=="add"){
+                // todo 弹窗 出现新增页面
+            }
+        }
+
         onMounted(async () => {
             const res = await APIs._APIModuleList({
                 page: currentPage.value,
@@ -70,7 +77,7 @@ export default defineComponent({
                         <p class={cn("text-gray-600 dark:text-gray-400 mt-1 text-sm")}>
                             Discover and manage your API endpoints
                         </p>
-                        <OperateList />
+                        <OperateList onBtnClick={handleOperate}/>
                     </div>
                 </div>
 
