@@ -27,25 +27,26 @@ export default defineComponent({
         },
         dropdownProps: {
             type: Object,
-            default: () => ({
-                modelValue: "1",
-                options: [
-                    {
-                        value: '1',
-                        label: '选项1',
-                        disabled: false,
-                        active: true
-                    },
-                    {
-                        value: '2',
-                        label: '选项2',
-                        disabled: false,
-                        active: false
-                    }
-                ],
-                placeholder: '请选择',
-                disabled: false
-            })
+            // default: () => ({
+            //     modelValue: "1",
+            //     options: [
+            //         {
+            //             value: '1',
+            //             label: '选项1',
+            //             disabled: false,
+            //             active: true
+            //         },
+            //         {
+            //             value: '2',
+            //             label: '选项2',
+            //             disabled: false,
+            //             active: false
+            //         }
+            //     ],
+            //     placeholder: '请选择',
+            //     disabled: false
+            // })
+            default: null
         }
     },
     components: {
@@ -53,7 +54,6 @@ export default defineComponent({
     },
     emits: ['selectChange'],
     setup(props, { emit, slots }) {
-
         return () => (
             <>
                 {/* Backdrop */}
@@ -97,15 +97,16 @@ export default defineComponent({
                                     <h3 class={cn("text-lg font-medium text-gray-900 dark:text-gray-100")}>
                                         {props.title}
                                     </h3>
-                                    <Select
-                                        modelValue={props.dropdownProps.modelValue}
-                                        options={props.dropdownProps.options}
-                                        placeholder={props.dropdownProps.placeholder}
-                                        disabled={props.dropdownProps.disabled}
-                                        bordered={props.dropdownProps.bordered}
-                                        onUpdate:modelValue={(v) => emit('selectChange', v)}
-                                    >
-                                    </Select>
+                                    {props.dropdownProps && (
+                                        <Select
+                                            modelValue={props.dropdownProps.modelValue}
+                                            options={props.dropdownProps.options}
+                                            placeholder={props.dropdownProps.placeholder}
+                                            disabled={props.dropdownProps.disabled}
+                                            bordered={props.dropdownProps.bordered}
+                                            onUpdate:modelValue={(v) => emit('selectChange', v)}
+                                        />
+                                    )}
                                     {props.showClose && (
                                         <button
                                             onClick={() => props.onClose()}
@@ -128,7 +129,9 @@ export default defineComponent({
 
                                 {/* Dialog Footer */}
                                 {slots.footer && (
-                                    <div class={cn("px-6 py-4 border-t dark:border-gray-700 flex justify-end space-x-3")}>
+                                    <div class={cn(
+                                        "px-6 py-2 border-t dark:border-gray-700 flex justify-end space-x-3",
+                                    )}>
                                         {slots.footer()}
                                     </div>
                                 )}

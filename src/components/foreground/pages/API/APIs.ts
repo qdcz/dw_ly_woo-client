@@ -8,6 +8,7 @@ import {
     UpdateAPIModuleRequest,
     AddAPIModuleRequest,
     GetProjectInfo,
+    ProjectList,
     APIExecutePreview
 } from '@/api';
 
@@ -148,6 +149,17 @@ const _GetProjectInfo = (projectId: string) => {
     return GetProjectInfo(projectId)
 };
 
+// 获取项目列表
+const _ProjectList = (params) => {
+    if (!params) {
+        params = {
+            page: 1,
+            take: 10
+        };
+    }
+    return ProjectList(params)
+};
+
 // 接口调用预览结果
 const _APIExecutePreview = (eName: string, apiId: string, data: any, headers: any) => {
     return APIExecutePreview(eName, apiId, data, headers)
@@ -163,5 +175,6 @@ export default {
     _UpdateAPIModuleRequest,
     _AddAPIModuleRequest,
     _GetProjectInfo,
-    _APIExecutePreview
+    _ProjectList,
+    _APIExecutePreview,
 }

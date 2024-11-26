@@ -33,7 +33,7 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      textWidth.value = getTextWidth(props.text, 40);
+      textWidth.value = getTextWidth(props.text, 60);
     });
 
     return () => (

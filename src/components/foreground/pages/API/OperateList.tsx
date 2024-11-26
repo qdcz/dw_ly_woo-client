@@ -12,6 +12,7 @@ export default defineComponent({
     Add,
     Mutilate,
   },
+
   setup(props, { emit }) {
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -20,7 +21,6 @@ export default defineComponent({
       const type = button.getAttribute("data-type");
       emit("btnClick", type);
     };
-
     return () => (
       <div
         class={cn(

@@ -1,9 +1,11 @@
 import { defineComponent, onMounted, ref } from 'vue';
-import APIs from './APIs';
 import { API_METHOD, API_STEP } from '@/constants';
 import router from '@/router/index.ts';
 import { cn } from '@/utils/index';
+import APIs from './APIs';
+
 import OperateList from './OperateList';
+import CreateAPI from './CreateAPI';
 
 interface IAPI {
     id: number;
@@ -17,7 +19,8 @@ interface IAPI {
 export default defineComponent({
     name: "API",
     components: {
-        OperateList
+        OperateList,
+        CreateAPI
     },
     setup() {
         const tableData = ref([]);
@@ -37,6 +40,8 @@ export default defineComponent({
         //     });
         // };
 
+        const isCreateAPI = ref(false);
+
         const trigger = (e: MouseEvent) => {
             // 获取最近的data-id元素
             const target = (e.target as HTMLElement).closest('[data-id]');
@@ -50,7 +55,7 @@ export default defineComponent({
 
         const handleOperate = (type:string)=>{
             if(type=="add"){
-                // todo 弹窗 出现新增页面
+                isCreateAPI.value = true;
             }
         }
 
@@ -144,6 +149,8 @@ export default defineComponent({
                         </div>
                     ))}
                 </div>
+
+                <CreateAPI isOpen={isCreateAPI.value} onClose={() => { isCreateAPI.value = false }} />
 
                 {/* <el-pagination
                     onCurrentChange={handleCurrentChange}

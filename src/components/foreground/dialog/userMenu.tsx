@@ -46,7 +46,7 @@ export default defineComponent({
             },
             {
                 icon: UserIcon,
-                text: "Theme Toggle", 
+                text: "Theme Toggle",
                 onClick: () => { toggleDarkMode() }
             },
             {

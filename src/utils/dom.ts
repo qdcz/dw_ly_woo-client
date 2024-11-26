@@ -5,13 +5,25 @@
  * @returns 宽度
  */
 export const getTextWidth = (text: string, padding: number) => {
-    const span = document.createElement("span");
-    span.className = "text-white text-sm";
-    span.style.position = "absolute";
-    span.style.visibility = "hidden";
-    span.textContent = text;
-    document.body.appendChild(span);
-    return span.offsetWidth + padding;
+    // const span = document.createElement("span");
+    // span.className = "text-white text-sm";
+    // span.style.position = "absolute";
+    // span.style.visibility = "hidden";
+    // span.textContent = text;
+    // document.body.appendChild(span);
+    // // 移除dom元素
+    // setTimeout(() => {
+    //     document.body.removeChild(span);
+    // }, 1);
+    // return span.offsetWidth + padding;
+
+    // 每次创建 DOM 元素都会占用内存，重绘和重排，触发垃圾回收，所以使用 canvas 来测量文字宽度
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    if (!context) return 0; // 如果获取上下文失败，返回 0
+    context.font = "12px sans-serif"; // 设置字体样式，需与实际使用的样式一致
+    const textWidth = context.measureText(text).width;
+    return textWidth + padding;
 };
 
 
