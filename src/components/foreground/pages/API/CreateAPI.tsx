@@ -4,8 +4,10 @@ import { cn } from '@/utils';
 
 import Input from '@/components/foreground/form/Input.tsx';
 import Select from '@/components/foreground/form/Select.tsx';
+import Form from '@/components/foreground/form/Form.tsx';
 import APIs from './APIs';
 import { API_METHOD, API_STEP } from '@/constants';
+import { ElMessage } from 'element-plus';
 
 export default defineComponent({
     props: {
@@ -22,13 +24,15 @@ export default defineComponent({
     components: {
         PublicDialog,
         Input,
-        Select
+        Select,
+        Form
     },
     setup(props) {
 
         const projectList: any = ref([]);
         const apiMethodList: any = ref([]);
         const apiStepList: any = ref([]);
+        const formRef: any = ref(null);
         const formData = reactive({
             projectId: '',
             apiPath: '',
@@ -39,20 +43,50 @@ export default defineComponent({
             apiType: '',
             apiMethod: '',
             apiStep: '',
-
-            // 表单验证错误信息
-            projectIdCheckError: '项目信息是必须的',
-            apiPathCheckError: 'API路径是必须的',
-            apiNameCheckError: 'API名称是必须的',
-            apiDescriptionCheckError: 'API描述是必须的',
-            apiBannerCheckError: 'API横幅是必须的',
-            apiMethodCheckError: 'API方法类型是必须的',
-            apiStepCheckError: 'API步骤类型是必须的',
         });
+        const formDataRules = reactive(
+            {
+                projectId: {
+                    required: true,
+                    message: '项目信息是必须的'
+                },
+                apiPath: {
+                    required: true,
+                    message: 'API路径是必须的'
+                },
+                apiName: {
+                    required: true,
+                    message: 'API名称是必须的'
+                },
+                apiDescription: {
+                    required: false,
+                    message: 'API描述是必须的'
+                },
+                apiBanner: {
+                    required: true,
+                    message: 'API横幅是必须的'
+                },
+                apiMethod: {
+                    required: true,
+                    message: 'API方法类型是必须的'
+                },
+                apiStep: {
+                    required: true,
+                    message: 'API步骤类型是必须的'
+                }
+            }
+        );
 
-        const onConfirm = (e: MouseEvent) => {
-            console.log(formData);
-            props.onClose();
+        const onConfirm = async (e: MouseEvent) => {
+            // console.log(formData);
+            // const checkError = formRef.value[0].validate();
+            await formRef.value[0]().then((res: any) => {
+                console.log(res);
+            }).catch((err: any) => {
+                ElMessage.error(err.message);
+            })
+            // console.log();
+            // props.onClose();
         }
 
         onMounted(async () => {
@@ -80,36 +114,36 @@ export default defineComponent({
 
         const renderFormFields = (formData: any, projectList: any, apiMethodList: any, apiStepList: any) => {
             return (
-                <>
+                <Form ref={formRef} modelValue={formData} rules={formDataRules}>
                     <div class={cn("mb-4")}>
-                        <Select placeholder="select your project" modelValue={formData.projectId} options={projectList.value}
-                            onUpdate:modelValue={(value: string) => formData.projectId = value} checkError={formData.projectIdCheckError} />
+                        <Select prop="projectId" placeholder="select your project" modelValue={formData.projectId} options={projectList.value}
+                            onUpdate:modelValue={(value: string) => formData.projectId = value} />
                     </div>
                     <div class={cn("mb-4")}>
-                        <Input placeholder="enter your api path" bordered={true} modelValue={formData.apiPath}
-                            onUpdate:modelValue={(value: string) => formData.apiPath = value} checkError={formData.apiPathCheckError} />
+                        <Input prop="apiPath" placeholder="enter your api path" bordered={true} modelValue={formData.apiPath}
+                            onUpdate:modelValue={(value: string) => formData.apiPath = value} />
                     </div>
                     <div class={cn("mb-4")}>
-                        <Input placeholder="enter your api name" bordered={true} modelValue={formData.apiName}
-                            onUpdate:modelValue={(value: string) => formData.apiName = value} checkError={formData.apiNameCheckError} />
+                        <Input prop="apiName" placeholder="enter your api name" bordered={true} modelValue={formData.apiName}
+                            onUpdate:modelValue={(value: string) => formData.apiName = value} />
                     </div>
                     <div class={cn("mb-4")}>
-                        <Input placeholder="enter your api description" bordered={true} modelValue={formData.apiDescription} type="textarea"
-                            onUpdate:modelValue={(value: string) => formData.apiDescription = value} checkError={formData.apiDescriptionCheckError} />
+                        <Input prop="apiDescription" placeholder="enter your api description" bordered={true} modelValue={formData.apiDescription} type="textarea"
+                            onUpdate:modelValue={(value: string) => formData.apiDescription = value} />
                     </div>
                     <div class={cn("mb-4")}>
-                        <Input placeholder="enter your api banner" bordered={true} modelValue={formData.apiBanner}
-                            onUpdate:modelValue={(value: string) => formData.apiBanner = value} checkError={formData.apiBannerCheckError} />
+                        <Input prop="apiBanner" placeholder="enter your api banner" bordered={true} modelValue={formData.apiBanner}
+                            onUpdate:modelValue={(value: string) => formData.apiBanner = value} />
                     </div>
                     <div class={cn("mb-4")}>
-                        <Select placeholder="select your api method" modelValue={formData.apiMethod} options={apiMethodList.value}
-                            onUpdate:modelValue={(value: string) => formData.apiMethod = value} checkError={formData.apiMethodCheckError} />
+                        <Select prop="apiMethod" placeholder="select your api method" modelValue={formData.apiMethod} options={apiMethodList.value}
+                            onUpdate:modelValue={(value: string) => formData.apiMethod = value} />
                     </div>
                     <div class={cn("mb-4")}>
-                        <Select placeholder="select your api step" modelValue={formData.apiStep} options={apiStepList.value}
-                            onUpdate:modelValue={(value: string) => formData.apiStep = value} checkError={formData.apiStepCheckError} />
+                        <Select prop="apiStep" placeholder="select your api step" modelValue={formData.apiStep} options={apiStepList.value}
+                            onUpdate:modelValue={(value: string) => formData.apiStep = value} />
                     </div>
-                </>
+                </Form>
             );
         };
 

@@ -1,5 +1,6 @@
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, inject } from 'vue';
 import { cn } from '@/utils/tailwindcss';
+import { FORM_INJECTION_KEY } from '@/tokens';
 
 export default defineComponent({
     name: "Input",
@@ -25,8 +26,8 @@ export default defineComponent({
             type: String,
             default: 'input'
         },
-        // 表单验证错误信息
-        checkError: {
+        // 表单验证的prop
+        prop: {
             type: String,
             default: ''
         }
@@ -34,6 +35,8 @@ export default defineComponent({
     emits: ['dataChange', "update:modelValue", "enterPressed"],
     setup(props, { emit }) {
 
+        // 表单的验证错误信息
+        const checkError = inject(FORM_INJECTION_KEY)?.checkError;
         const IsShowCheckError = ref(false);
 
         const handleInput = (event: Event) => {
@@ -108,7 +111,7 @@ export default defineComponent({
 
                 {/* field check error */}
                 <div class={cn("text-red-500 text-xs transition-all duration-300 ease-linear", IsShowCheckError.value && "opacity-100")}>
-                    {props.checkError}
+                    {checkError?.value[props.prop]}
                 </div>
             </>
 

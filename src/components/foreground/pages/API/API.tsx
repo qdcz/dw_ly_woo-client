@@ -64,7 +64,6 @@ export default defineComponent({
                 page: currentPage.value,
                 take: pageSize.value
             });
-            console.log(res);
             if (res) {
                 tableData.value = res.data;
                 total.value = res.total;
