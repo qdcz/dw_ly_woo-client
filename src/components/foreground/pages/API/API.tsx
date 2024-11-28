@@ -53,13 +53,13 @@ export default defineComponent({
             }
         };
 
-        const handleOperate = (type:string)=>{
-            if(type=="add"){
+        const handleOperate = (type: string) => {
+            if (type == "add") {
                 isCreateAPI.value = true;
             }
         }
 
-        onMounted(async () => {
+        const getAPIModuleList = async () => {
             const res = await APIs._APIModuleList({
                 page: currentPage.value,
                 take: pageSize.value
@@ -68,6 +68,10 @@ export default defineComponent({
                 tableData.value = res.data;
                 total.value = res.total;
             }
+        };
+
+        onMounted(async () => {
+            await getAPIModuleList();
         });
 
         return () => (
@@ -81,7 +85,7 @@ export default defineComponent({
                         <p class={cn("text-gray-600 dark:text-gray-400 mt-1 text-sm")}>
                             Discover and manage your API endpoints
                         </p>
-                        <OperateList onBtnClick={handleOperate}/>
+                        <OperateList onBtnClick={handleOperate} />
                     </div>
                 </div>
 
@@ -149,7 +153,7 @@ export default defineComponent({
                     ))}
                 </div>
 
-                <CreateAPI isOpen={isCreateAPI.value} onClose={() => { isCreateAPI.value = false }} />
+                <CreateAPI onRefresh={getAPIModuleList} isOpen={isCreateAPI.value} onClose={() => { isCreateAPI.value = false }} />
 
                 {/* <el-pagination
                     onCurrentChange={handleCurrentChange}

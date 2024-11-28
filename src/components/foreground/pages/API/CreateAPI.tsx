@@ -27,7 +27,8 @@ export default defineComponent({
         Select,
         Form
     },
-    setup(props) {
+    emits: ['refresh'],
+    setup(props, { emit }) {
 
         const projectList: any = ref([]);
         const apiMethodList: any = ref([]);
@@ -62,10 +63,10 @@ export default defineComponent({
                     required: false,
                     message: 'API描述是必须的'
                 },
-                apiBanner: {
-                    required: true,
-                    message: 'API横幅是必须的'
-                },
+                // apiBanner: {
+                //     required: true,
+                //     message: 'API横幅是必须的'
+                // },
                 apiMethod: {
                     required: true,
                     message: 'API方法类型是必须的'
@@ -77,16 +78,41 @@ export default defineComponent({
             }
         );
 
+
+        const resetFormData = () => {
+            formData.projectId = '';
+            formData.apiPath = '';
+            formData.apiName = '';
+            formData.apiDescription = '';
+            formData.apiMethod = '';
+            formData.apiStep = '';
+        }
+
         const onConfirm = async (e: MouseEvent) => {
-            // console.log(formData);
-            // const checkError = formRef.value[0].validate();
-            await formRef.value[0]().then((res: any) => {
-                console.log(res);
+            await formRef.value[0]().then(async () => {
+                const res: any = await APIs._AddAPIModule({
+                    projectId: formData.projectId,
+                    parentId: "",
+                    path: formData.apiPath,
+                    name: formData.apiName,
+                    description: formData.apiDescription,
+                    thumbnail: "",
+                    status: formData.apiStatus || 0, // 是否启用 0启用 1禁用
+                    step: Number(formData.apiStep), // 开发状态
+                    type: 1,  // 1接口 2模块
+                    method: Number(formData.apiMethod), // 请求方法
+                });
+                if (res.code === 200) {
+                    ElMessage.success("新增API成功");
+                    // clear form data
+                    resetFormData();
+                    // emit refresh event
+                    emit('refresh');
+                    props.onClose();
+                }
             }).catch((err: any) => {
-                ElMessage.error(err.message);
+                ElMessage.error("validate error: " + Object.values(err)[0] as string);
             })
-            // console.log();
-            // props.onClose();
         }
 
         onMounted(async () => {
@@ -131,10 +157,10 @@ export default defineComponent({
                         <Input prop="apiDescription" placeholder="enter your api description" bordered={true} modelValue={formData.apiDescription} type="textarea"
                             onUpdate:modelValue={(value: string) => formData.apiDescription = value} />
                     </div>
-                    <div class={cn("mb-4")}>
+                    {/* <div class={cn("mb-4")}>
                         <Input prop="apiBanner" placeholder="enter your api banner" bordered={true} modelValue={formData.apiBanner}
                             onUpdate:modelValue={(value: string) => formData.apiBanner = value} />
-                    </div>
+                    </div> */}
                     <div class={cn("mb-4")}>
                         <Select prop="apiMethod" placeholder="select your api method" modelValue={formData.apiMethod} options={apiMethodList.value}
                             onUpdate:modelValue={(value: string) => formData.apiMethod = value} />

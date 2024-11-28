@@ -1,5 +1,6 @@
-import { computed, defineComponent, ref, Transition, onMounted, onUnmounted } from 'vue';
+import { computed, defineComponent, ref, Transition, onMounted, onUnmounted, inject } from 'vue';
 import { cn } from '@/utils/tailwindcss';
+import { FORM_INJECTION_KEY } from '@/tokens/components';
 
 export default defineComponent({
     name: "Select",
@@ -25,10 +26,18 @@ export default defineComponent({
         bordered: {
             type: Boolean,
             default: true
+        },
+        prop: {
+            type: String,
+            default: ''
         }
     },
     emits: ['update:modelValue'],
     setup(props, { emit }) {
+
+        // 表单的验证错误信息
+        const checkError = inject(FORM_INJECTION_KEY)?.checkError;
+
         const isOpen = ref(false);
         const selectRef = ref<HTMLDivElement | null>(null);
 
@@ -74,7 +83,6 @@ export default defineComponent({
                         "text-gray-800 dark:text-gray-200",
                         "hover:bg-gray-50 dark:hover:bg-gray-750",
                         props.bordered && "border border-gray-200 dark:border-gray-700",
-                        props.bordered && "focus:outline-none focus:ring-1 focus:ring-blue-400",
                         props.disabled && "opacity-50 cursor-not-allowed",
                         !props.disabled && "cursor-pointer",
                         "transition duration-200 ease-in",
@@ -105,6 +113,10 @@ export default defineComponent({
                     </svg>
                 </button>
 
+                {/* field check error */}
+                <div class={cn("text-red-500 text-xs mt-1 ml-2 transition-all duration-300 ease-linear")}>
+                    {checkError?.value[props.prop]}
+                </div>
 
                 {/** drop down list */}
                 <Transition
@@ -118,8 +130,8 @@ export default defineComponent({
                     {isOpen.value && (
                         <div class={cn(
                             "absolute z-10 w-full mt-1 rounded shadow-sm",
-                            "bg-white dark:bg-gray-800",
-                            "border border-gray-200 dark:border-gray-700",
+                            "bg-white dark:bg-gray-600",
+                            "border border-gray-200 dark:border-gray-500",
                             "text-sm",
                             "w-full"
                         )}>

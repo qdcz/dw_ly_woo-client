@@ -9,7 +9,8 @@ import {
     AddAPIModuleRequest,
     GetProjectInfo,
     ProjectList,
-    APIExecutePreview
+    APIExecutePreview,
+    AddAPIModule
 } from '@/api';
 
 
@@ -165,6 +166,11 @@ const _APIExecutePreview = (eName: string, apiId: string, data: any, headers: an
     return APIExecutePreview(eName, apiId, data, headers)
 };
 
+// 新增API
+const _AddAPIModule = (params) => {
+    return AddAPIModule(params)
+};
+
 export default {
     _APIModuleList,
     _APIInfo,
@@ -177,4 +183,5 @@ export default {
     _GetProjectInfo,
     _ProjectList,
     _APIExecutePreview,
+    _AddAPIModule,
 }

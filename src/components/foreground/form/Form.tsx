@@ -17,6 +17,7 @@ export default defineComponent({
         const checkError = ref({});
         const validate = () => {
             return new Promise((resolve, reject) => {
+                checkError.value = {};
                 let isPass = true;
                 if (typeof checkError.value !== 'object') {
                     isPass = false;
@@ -25,15 +26,13 @@ export default defineComponent({
                 if (Object.keys(props.rules).length > 0) {
                     for (let i in props.rules) {
                         if (props.rules[i].required) {
-                            checkError.value[i] = props.modelValue[i].value ? "" : props.rules[i].message;
-                            !props.modelValue[i].value && (isPass = false);
-                        } else {
-                            checkError.value[i] = "";
+                            !props.modelValue[i] ? checkError.value[i] = props.rules[i].message : "";
+                            !props.modelValue[i] && (isPass = false);
                         }
                     }
                 }
                 if (isPass) {
-                    resolve({});
+                    resolve(true);
                 } else {
                     reject(checkError.value);
                 }

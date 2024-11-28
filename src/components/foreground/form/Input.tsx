@@ -37,7 +37,6 @@ export default defineComponent({
 
         // 表单的验证错误信息
         const checkError = inject(FORM_INJECTION_KEY)?.checkError;
-        const IsShowCheckError = ref(false);
 
         const handleInput = (event: Event) => {
             const target = event.target as HTMLInputElement;
@@ -110,7 +109,7 @@ export default defineComponent({
                 )}
 
                 {/* field check error */}
-                <div class={cn("text-red-500 text-xs transition-all duration-300 ease-linear", IsShowCheckError.value && "opacity-100")}>
+                <div class={cn("text-red-500 text-xs mt-1 ml-2 transition-all duration-300 ease-linear")}>
                     {checkError?.value[props.prop]}
                 </div>
             </>

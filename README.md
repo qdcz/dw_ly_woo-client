@@ -1,3 +1,11 @@
+# 简介
+
+woo-server 是一个基于便于用户快速创建API和数据管理的系统，可视化配置操作，有离线部署部署包。
+
+在线地址: https://www.dwly.site:4999/static/admin
+
+# 项目遇到的问题
+
 ## vite 使用 需要 node 环境支持的库 比如安装了 minio 报了 process is not defined 错误
 
 原因:
