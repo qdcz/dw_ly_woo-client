@@ -1,6 +1,6 @@
 # 简介
 
-woo-server 是一个基于便于用户快速创建API和数据管理的系统，可视化配置操作，有离线部署部署包。
+woo-server 是一个便于用户快速创建API和数据管理的系统，可视化配置操作，支持离线部署部署。
 
 在线地址: https://www.dwly.site:4999/static/admin
 

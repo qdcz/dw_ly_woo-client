@@ -70,6 +70,11 @@ export default defineComponent({
             }
         };
 
+        const RightClick = (e: MouseEvent) => {
+            e.preventDefault();
+            console.log(e);
+        }
+
         onMounted(async () => {
             await getAPIModuleList();
         });
@@ -95,7 +100,7 @@ export default defineComponent({
                 <div class={cn("grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 select-none")} onClick={trigger}>
                     {/* API Cards */}
                     {tableData.value?.map((api: IAPI) => (
-                        <div data-id={api.id} class={cn(
+                        <div data-id={api.id} onContextmenu={RightClick} class={cn(
                             "group relative bg-white dark:bg-gray-800 p-3 rounded-lg",
                             "border border-gray-200 dark:border-gray-700",
                             "hover:border-blue-400 dark:hover:border-blue-500",

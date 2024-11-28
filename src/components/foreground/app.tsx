@@ -8,8 +8,10 @@ import SettingsIcon from "./icon/Settings.tsx";
 import ProjectIcon from "./icon/Project.tsx";
 import DataBaseIcon from "./icon/DataBase.tsx";
 import APIIcon from "./icon/API.tsx";
+import FoldIcon from "./icon/Fold.tsx";
+import CloseIcon from "./icon/Close.tsx";
 import { LEFT_SIDEBAR_WIDTH } from "@/constants";
-import { cn } from "@/utils/index";
+import { cn, throttle } from "@/utils/index";
 
 export default defineComponent({
     components: {
@@ -18,6 +20,8 @@ export default defineComponent({
         ProjectIcon,
         DataBaseIcon,
         APIIcon,
+        FoldIcon,
+        CloseIcon
     },
     setup() {
         const userStore = UserStore();
@@ -120,16 +124,6 @@ export default defineComponent({
             isUserMenuOpen.value = !isUserMenuOpen.value;
         };
 
-        const throttle = (fn: () => void, delay: number) => {
-            let timer: NodeJS.Timeout | null = null;
-            return () => {
-                if (timer) return;
-                timer = setTimeout(() => {
-                    fn();
-                    timer = null;
-                }, delay);
-            };
-        };
 
         // 添加窗口大小变化监听
         const handleResize = throttle(() => {
@@ -154,19 +148,7 @@ export default defineComponent({
                                 class={cn("md:hidden fixed top-4 left-4 z-10")}
                                 onClick={toggleSidebar}
                             >
-                                <svg
-                                    class={cn("w-6 h-6 dark:text-white")}
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                </svg>
+                                <FoldIcon />
                             </button>
 
                             <UserMenu
@@ -196,19 +178,7 @@ export default defineComponent({
                                             onClick={toggleSidebar}
                                             class={cn("md:hidden ml-auto p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full")}
                                         >
-                                            <svg
-                                                class={cn("w-5 h-5 text-gray-600 dark:text-gray-400")}
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="2"
-                                                    d="M6 18L18 6M6 6l12 12"
-                                                />
-                                            </svg>
+                                            <CloseIcon />
                                         </button>
                                     </div>
                                     {/* Navigation */}
@@ -270,13 +240,9 @@ export default defineComponent({
 
                             {/* Main content */}
                             <main class={cn("flex-1 bg-white dark:bg-gray-900 px-4 lg:pr-4 lg:m-2 lg:rounded-lg lg:shadow-sm overflow-auto no-scrollbar")}>
-                                {/* Top gradient mask */}
-                                {/* <div class="sticky top-0 h-8 bg-gradient-to-b from-white via-white/80 to-transparent dark:from-gray-900 dark:via-gray-900/80 pointer-events-none"></div> */}
-                                <div class={cn("md:my-8")}>
+                                <div class={cn("my-8")}>
                                     <router-view></router-view>
                                 </div>
-                                {/* Bottom gradient mask */}
-                                {/* <div class="sticky bottom-0 h-8 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-gray-900 dark:via-gray-900/80 pointer-events-none"></div> */}
                             </main>
                         </div>)
                 }

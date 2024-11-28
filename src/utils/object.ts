@@ -27,3 +27,14 @@ export const throttle = <T extends (...args: any[]) => any>(func: T, delay: numb
         }
     }
 }
+
+// export const throttle = (fn: () => void, delay: number) => {
+//     let timer: NodeJS.Timeout | null = null;
+//     return () => {
+//         if (timer) return;
+//         timer = setTimeout(() => {
+//             fn();
+//             timer = null;
+//         }, delay);
+//     };
+// };
