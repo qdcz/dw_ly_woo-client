@@ -10,7 +10,8 @@ import {
     GetProjectInfo,
     ProjectList,
     APIExecutePreview,
-    AddAPIModule
+    AddAPIModule,
+    APIModuleBindindUnits
 } from '@/api';
 
 
@@ -171,6 +172,11 @@ const _AddAPIModule = (params) => {
     return AddAPIModule(params)
 };
 
+// 获取接口绑定的数据单元列表
+const _APIModuleBindindUnits = (params) => {
+    return APIModuleBindindUnits(params)
+};
+
 export default {
     _APIModuleList,
     _APIInfo,
@@ -184,4 +190,5 @@ export default {
     _ProjectList,
     _APIExecutePreview,
     _AddAPIModule,
+    _APIModuleBindindUnits,
 }

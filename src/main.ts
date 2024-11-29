@@ -18,9 +18,16 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 }
 
 
-
 initTheme();
 
+
+app.config.warnHandler = (msg, vm, trace) => {
+    if (msg.includes('injection "Symbol(form)" not found')) {
+        // Ignore this warning
+        return;
+    }
+    console.warn(msg, vm, trace);
+};
 
 app.use(createPinia());
 app.use(router);

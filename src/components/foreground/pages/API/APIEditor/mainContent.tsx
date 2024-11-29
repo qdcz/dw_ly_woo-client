@@ -8,6 +8,7 @@ import MonacoEditor from '@/components/monaco.vue';
 import editorFuncBox from '@/components/editor-func-box/index.jsx';
 import APIHeader from './APIHeader';
 import APIBody from './APIBody';
+import DataUnit from './DataUnit';
 
 const defaultPrePostprocessingForm = {
     id: '',
@@ -23,7 +24,8 @@ export default defineComponent({
         MonacoEditor,
         editorFuncBox,
         APIHeader,
-        APIBody
+        APIBody,
+        DataUnit
     },
     setup(props) {
         const route = useRoute();
@@ -428,10 +430,10 @@ export default defineComponent({
                         </div>
                     </div>
 
-                    {/* 请求头和参数切换部分 */}
+                    {/* 请求头、参数、数据单元、处理函数切换部分 */}
                     <div class={cn("mt-8")}>
                         <div class={cn("flex border-b border-gray-200 dark:border-gray-700")}>
-                            {['headers', 'params', 'Processing Function'].map(tab => (
+                            {['Headers', 'Params', "Data Unit", 'Processing Function'].map(tab => (
                                 <div
                                     class={cn(
                                         "px-4 py-2 cursor-pointer",
@@ -448,7 +450,7 @@ export default defineComponent({
                         </div>
 
                         <div>
-                            {activeTab.value === 'headers' && (
+                            {activeTab.value === 'Headers' && (
                                 <div class={cn("p-4")}>
                                     <div class={cn("text-lg font-bold")}>
                                         <APIHeader
@@ -460,7 +462,7 @@ export default defineComponent({
                                     </div>
                                 </div>
                             )}
-                            {activeTab.value === 'params' && (
+                            {activeTab.value === 'Params' && (
                                 <div class={cn("p-4")}>
                                     <div class={cn("text-lg font-bold")}>
                                         <APIBody
@@ -469,6 +471,13 @@ export default defineComponent({
                                                 paramsDataChange("bodys", val, enableHaderRealTimeSync)
                                             }}
                                         />
+                                    </div>
+                                </div>
+                            )}
+                            {activeTab.value === 'Data Unit' && (
+                                <div class={cn("p-4")}>
+                                    <div class={cn("text-lg font-bold")}>
+                                        <DataUnit />
                                     </div>
                                 </div>
                             )}
