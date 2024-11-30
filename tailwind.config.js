@@ -4,6 +4,9 @@ export default {
     content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
     theme: {
         extend: {
+            left: {
+            
+            },
             zIndex: {
                 100: "100",
             },

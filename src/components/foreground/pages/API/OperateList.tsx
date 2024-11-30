@@ -30,7 +30,7 @@ export default defineComponent({
         onClick={handleClick}
       >
         <IconButton text={"Create New API"} data-type="add">
-          <Add width={"1rem"} height={"1rem"}></Add>
+          <Add width="5" height="5"></Add>
         </IconButton>
         <IconButton text={"Multiple Choice API"} data-type="mutilate">
           <Mutilate width="5" height="5"></Mutilate>

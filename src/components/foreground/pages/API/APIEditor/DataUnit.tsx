@@ -1,30 +1,52 @@
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { defineComponent, nextTick, onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import Sortable from 'sortablejs';
+
+import { DATA_UNIT_TYPE } from "@/constants";
 import { cn } from "@/utils/tailwindcss";
 import APIs from "../APIs";
-import { useRoute } from "vue-router";
-import { DATA_UNIT_TYPE } from "@/constants";
+
+// components
 import Switch from "@/components/foreground/form/Switch";
+import Confirm from "@/components/foreground/dialog/confirm";
+import BindDataUnitDialog from "./BindDataUnitDialog";
+
+// icon
 import DeleteIcon from "@/components/foreground/icon/Delete";
 import RunIcon from '@/components/foreground/icon/Run';
+import AddIcon from '@/components/foreground/icon/Add';
 import MultipleIcon from '@/components/foreground/icon/Mutilate';
+
+
 
 export default defineComponent({
     name: "DataUnit",
     components: {
         Switch,
+        Confirm,
+        BindDataUnitDialog,
         DeleteIcon,
         RunIcon,
-        MultipleIcon
+        MultipleIcon,
+        AddIcon
     },
     setup() {
         const route = useRoute();
         const dataUnitList = ref<Array<any>>([]);
-        const isDragging = ref(false);
-        const dragStartIndex = ref(null);
+        const dataUnitListSortable = ref<any>(null);
+        const IsShowSortConfirmDialog = ref<boolean>(false);
+        const CurrentComfirmType = ref<string>("");
+        const ConfirmTitle = ref<string>("Tip");
+        const ConfirmMessage = ref<string>("Are you sure you want to save the changes?");
+
+        const IsShowBindDataUnitDialog = ref<boolean>(false);
 
         const formatterMStatus = (row: any) => row.m_status == 0 ? true : false; // 0:启用 1:禁用;
 
-        onMounted(async () => {
+        /**
+         * api request
+         */
+        const getAPIModuleBindindUnits = async () => {
             const res: any = await APIs._APIModuleBindindUnits({
                 apiId: route.query.id
             });
@@ -32,10 +54,28 @@ export default defineComponent({
                 dataUnitList.value = res.data.dataUnits;
                 dataUnitList.value.forEach((item: any) => item.m_status = formatterMStatus(item));
                 console.log("dataUnitList", dataUnitList.value);
+                nextTick(() => {
+                    setTimeout(() => {
+                        dataUnitListSortable.value = Sortable.create(document.getElementById('BindingDataUnitList'), {
+                            animation: 250,
+                            handle: '.DataUnitDrag',
+                            onEnd: () => {
+                                ConfirmMessage.value = "Are you sure you want to save the current order?";
+                                ConfirmTitle.value = "Tip";
+                                IsShowSortConfirmDialog.value = true;
+                                CurrentComfirmType.value = "save";
+                            }
+                        });
+                    }, 100);
+                })
             }
-        });
+        };
 
-        const handleUpdateMStatus = (data: any, value: boolean) => {
+
+        /**
+         * event handler
+         */
+        const updateMStatus = (data: any, value: boolean) => {
             dataUnitList.value.forEach((item: any) => {
                 if (data.id === item.id) {
                     item.m_status = value
@@ -43,52 +83,48 @@ export default defineComponent({
             });
         };
 
-        const handleDragStart = (index: number) => {
-            isDragging.value = true;
-            dragStartIndex.value = index;
+        const saveDataUnitSort = () => {
+            IsShowSortConfirmDialog.value = false;
+            console.log("saveDataUnitSort");
         };
 
-        const handleDragOver = (index: number) => {
-            if (isDragging.value) {
-                const dragStart = dragStartIndex.value;
-                const dragEnd = index;
-                if (dragStart !== dragEnd) {
-                    const item = dataUnitList.value[dragStart];
-                    dataUnitList.value.splice(dragStart, 1);
-                    dataUnitList.value.splice(dragEnd, 0, item);
-                    // Add animation here
-                    dataUnitList.value = dataUnitList.value.map((item, i) => {
-                        if (i === dragStart) {
-                            item.animation = 'move-up';
-                        } else if (i === dragEnd) {
-                            item.animation = 'move-down';
-                        } else {
-                            item.animation = '';
-                        }
-                        return item;
-                    });
-                }
+        const deleteDataUnit = (e: MouseEvent, data: any) => {
+            IsShowSortConfirmDialog.value = true;
+            ConfirmMessage.value = "Are you sure you want to delete the data unit binding to this API?";
+            CurrentComfirmType.value = "delete";
+            ConfirmTitle.value = "Warning";
+            console.log("deleteDataUnit", data);
+        };
+
+        const handleConfirm = () => {
+            const confirmType: string = CurrentComfirmType.value;
+            if (confirmType === "delete") {
+                console.log("handleConfirm");
+            } else if (confirmType === "save") {
+                saveDataUnitSort();
             }
         };
 
-        const handleDragEnd = () => {
-            isDragging.value = false;
-            dragStartIndex.value = null;
-            // Remove animation here
-            dataUnitList.value = dataUnitList.value.map(item => {
-                item.animation = '';
-                return item;
-            });
-        };
+
+        onMounted(async () => {
+            getAPIModuleBindindUnits();
+        });
 
         return () => (
             <div>
-                <div class={cn("text-lg font-bold", "dark:text-gray-300")}>
-                    Used to bind data units to interfaces
+                <Confirm title={ConfirmTitle.value} message={ConfirmMessage.value}
+                    isOpen={IsShowSortConfirmDialog.value} onCancel={() => IsShowSortConfirmDialog.value = false} onConfirm={handleConfirm}
+                />
+                <BindDataUnitDialog title="Bind Data Unit" isOpen={IsShowBindDataUnitDialog.value} onClose={() => IsShowBindDataUnitDialog.value = false} />
+
+
+                <div class={cn("text-lg font-bold", "dark:text-gray-300", "flex justify-between")}>
+                    <span class={cn("text-base")}>Used to bind data units to interfaces</span>
+                    <span><AddIcon width="6" height="6" hoverClass="hover:text-black dark:hover:text-blue-500 hover:scale-110" onClick={() => IsShowBindDataUnitDialog.value = true} /></span>
                 </div>
 
-
-                <div class={cn(
+                <div id="BindingDataUnitList" class={cn(
+                    "select-none",
                     "mt-4",
                     "px-2",
                     "rounded-lg",
@@ -98,10 +134,9 @@ export default defineComponent({
                     {dataUnitList.value.map((item: any, index: number) => (
                         <div class={cn(
                             "flex flex-wrap items-center justify-between",
-                            item.animation // Apply animation here
-                        )} draggable="true" ondragstart={() => handleDragStart(index)} ondragover={() => handleDragOver(index)} ondrop={() => handleDragEnd()}>
+                        )}>
                             <div class={cn("w-1/8 p-2 flex items-center gap-2")}>
-                                <MultipleIcon width="5" height="5" />
+                                <MultipleIcon width="5" height="5" class="DataUnitDrag" />
                             </div>
                             <div class={cn(
                                 "w-1/8",
@@ -113,11 +148,11 @@ export default defineComponent({
                             <div class={cn("w-1/4 p-2", "dark:text-gray-300", "text-sm")}>{item.name}</div>
                             <div class={cn("w-1/4 p-2", "dark:text-gray-400", "text-xs")}>{item.description}</div>
                             <div class={cn("w-1/8 p-2")}>
-                                <Switch modelValue={item.m_status} onUpdate:modelValue={handleUpdateMStatus.bind(null, item)} />
+                                <Switch modelValue={item.m_status} onUpdate:modelValue={updateMStatus.bind(null, item)} />
                             </div>
                             <div class={cn("w-1/8 p-2 flex items-center gap-2")}>
                                 <RunIcon width="5" height="5" />
-                                <DeleteIcon width="5" height="5" />
+                                <DeleteIcon width="5" height="5" onClick={deleteDataUnit.bind(null, item)} />
                             </div>
                         </div>
                     ))}

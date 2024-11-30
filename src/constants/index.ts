@@ -19,6 +19,6 @@ export const DATA_UNIT_TYPE = {
     3: 'Static单元',
 };
 
-export const LEFT_SIDEBAR_WIDTH = 60;
+export const LEFT_SIDEBAR_WIDTH = 200;
 export const MIN_HEIGHT_PREPROCESSING_EDITOR = 400;
 

@@ -382,7 +382,7 @@ export default defineComponent({
             <div class={cn("text-gray-900 dark:text-gray-100 relative h-screen w-full")}>
                 {/* API Info */}
                 <div class={cn("p-4")}>
-                    <div class={cn("text-2xl font-bold")}>{APIInfo.value?.name}</div>
+                    <div class={cn("text-2xl font-bold")}>{APIInfo.value?.name}({APIInfo.value?.path})</div>
                     <div class={cn("text-gray-600 dark:text-gray-400 mt-1 text-sm")}>{APIInfo.value?.description}</div>
                     <div class={cn("flex items-center space-x-2 mt-2")}>
                         <div class={cn(
@@ -397,8 +397,8 @@ export default defineComponent({
                         <div class={cn(
                             "text-gray-600 dark:text-slate-50",
                             "cursor-pointer relative group"
-                        )} onClick={() => copyToClipboard(`/visix/api/${APIInfo.value?.path}/${route.query.id}`)}>
-                            <div>/visix/api/{APIInfo.value?.path}/{route.query.id}</div>
+                        )} onClick={() => copyToClipboard(`/visix/api/${route.query.id}`)}>
+                            <div>/visix/api/{route.query.id}</div>
                             <div class={cn(
                                 "absolute -bottom-1.5 left-0 w-0 h-[2px]",
                                 "animate-pulse",
@@ -523,9 +523,8 @@ export default defineComponent({
                 </div>
 
                 {/* Loading */}
-                <div class={cn(
+                <div style={{ left: `${LEFT_SIDEBAR_WIDTH}px` }} class={cn(
                     "fixed",
-                    `w-[calc(100%-${LEFT_SIDEBAR_WIDTH}px)]`,
                     "inset-0",
                     "bg-white dark:bg-gray-900",
                     "px-4 lg:pr-4 lg:m-2",

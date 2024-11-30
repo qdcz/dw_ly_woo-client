@@ -50,62 +50,62 @@ export default defineComponent({
                 path: "/static/admin/#/API",
             },
             {
-                name: "API_old",
+                name: "Old_API",
                 icon: <APIIcon />,
                 path: "/static/admin/#/APIManager",
             },
             {
-                name: "FunctionManager_old",
+                name: "Old_FunctionManager",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/FunctionManager",
             },
             {
-                name: "ActiveKey_old",
+                name: "Old_ActiveKeyManager",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/ActiveKeyManager",
             },
             {
-                name: "logManager_old",
+                name: "Old_LogManager",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/logManager",
             },
             {
-                name: "MockManager_old",
+                name: "Old_MockManager",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/MockManager",
             },
             {
-                name: "SqlDataUnit_old",
+                name: "Old_SqlDataUnit",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/SqlDataUnit",
             },
             {
-                name: "Project_old",
+                name: "Old_ProjectManager",
                 icon: <ProjectIcon />,
                 path: "/static/admin/#/ProjectManager",
             },
             {
-                name: "DataBase_old",
+                name: "Old_DataBaseManager",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/dataSource",
             },
             {
-                name: "UserManager_old",
+                name: "Old_UserManager",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/userManager",
             },
             {
-                name: "roleManager_old",
+                name: "Old_RoleManager",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/roleManager",
             },
             {
-                name: "TacticsManager_old",
+                name: "Old_TacticsManager",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/TacticsManager",
             },
             {
-                name: "SystemAPIManager_old",
+                name: "Old_SystemAPIManager",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/SystemAPIManager",
             },
@@ -164,7 +164,7 @@ export default defineComponent({
                                     "md:translate-x-0 transition duration-200 ease-in-out z-40"
                                 )}
                             >
-                                <div class={cn(`w-[${LEFT_SIDEBAR_WIDTH}px] h-full bg-zinc-100 dark:bg-gray-800 z-50`)}>
+                                <div style={{ width: `${LEFT_SIDEBAR_WIDTH}px` }} class={cn(`h-full overflow-hide bg-zinc-100 dark:bg-gray-800 z-50`)}>
                                     {/* Logo */}
                                     <div class={cn("flex items-center p-4 border-b dark:border-gray-700")}>
                                         <div class={cn("w-8 h-8 bg-black dark:bg-white rounded-full flex items-center justify-center text-white dark:text-black")}>
