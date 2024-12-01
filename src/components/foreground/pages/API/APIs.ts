@@ -11,7 +11,8 @@ import {
     ProjectList,
     APIExecutePreview,
     AddAPIModule,
-    APIModuleBindindUnits
+    APIModuleBindindUnits,
+    DeleteAPIModuleDataUnits
 } from '@/api';
 
 
@@ -177,6 +178,11 @@ const _APIModuleBindindUnits = (params) => {
     return APIModuleBindindUnits(params)
 };
 
+// 删除接口绑定的数据单元
+const _DeleteAPIModuleDataUnits = (params) => {
+    return DeleteAPIModuleDataUnits(params)
+};
+
 export default {
     _APIModuleList,
     _APIInfo,
@@ -191,4 +197,5 @@ export default {
     _APIExecutePreview,
     _AddAPIModule,
     _APIModuleBindindUnits,
+    _DeleteAPIModuleDataUnits
 }

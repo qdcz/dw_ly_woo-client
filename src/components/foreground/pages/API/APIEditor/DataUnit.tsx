@@ -1,6 +1,8 @@
 import { defineComponent, nextTick, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import Sortable from 'sortablejs';
+// lib
+import { ElMessage } from "element-plus";
 
 import { DATA_UNIT_TYPE } from "@/constants";
 import { cn } from "@/utils/tailwindcss";
@@ -16,6 +18,7 @@ import DeleteIcon from "@/components/foreground/icon/Delete";
 import RunIcon from '@/components/foreground/icon/Run';
 import AddIcon from '@/components/foreground/icon/Add';
 import MultipleIcon from '@/components/foreground/icon/Mutilate';
+
 
 
 
@@ -39,6 +42,8 @@ export default defineComponent({
         const ConfirmTitle = ref<string>("Tip");
         const ConfirmMessage = ref<string>("Are you sure you want to save the changes?");
 
+        let NeedToDeleteDataUnitId: string = "";
+
         const IsShowBindDataUnitDialog = ref<boolean>(false);
 
         const formatterMStatus = (row: any) => row.m_status == 0 ? true : false; // 0:启用 1:禁用;
@@ -60,15 +65,19 @@ export default defineComponent({
                             animation: 250,
                             handle: '.DataUnitDrag',
                             onEnd: () => {
-                                ConfirmMessage.value = "Are you sure you want to save the current order?";
-                                ConfirmTitle.value = "Tip";
-                                IsShowSortConfirmDialog.value = true;
+                                updateConfirmDialogStatus(true, "Tip", "Are you sure you want to save the current order?");
                                 CurrentComfirmType.value = "save";
                             }
                         });
                     }, 100);
                 })
             }
+        };
+
+        const updateConfirmDialogStatus = (show: boolean, title: string, message: string) => {
+            IsShowSortConfirmDialog.value = show;
+            ConfirmTitle.value = title;
+            ConfirmMessage.value = message;
         };
 
 
@@ -88,18 +97,22 @@ export default defineComponent({
             console.log("saveDataUnitSort");
         };
 
-        const deleteDataUnit = (e: MouseEvent, data: any) => {
-            IsShowSortConfirmDialog.value = true;
-            ConfirmMessage.value = "Are you sure you want to delete the data unit binding to this API?";
+        const deleteDataUnit = (data: any) => {
+            updateConfirmDialogStatus(true, "Warning", "Are you sure you want to delete the data unit binding to this API?");
             CurrentComfirmType.value = "delete";
-            ConfirmTitle.value = "Warning";
-            console.log("deleteDataUnit", data);
+            NeedToDeleteDataUnitId = data.m_id;
         };
 
         const handleConfirm = () => {
             const confirmType: string = CurrentComfirmType.value;
             if (confirmType === "delete") {
-                console.log("handleConfirm");
+                APIs._DeleteAPIModuleDataUnits({
+                    unitIds: NeedToDeleteDataUnitId
+                }).then(() => {
+                    ElMessage.success("Delete success");
+                    IsShowSortConfirmDialog.value = false;
+                    getAPIModuleBindindUnits();
+                });
             } else if (confirmType === "save") {
                 saveDataUnitSort();
             }
