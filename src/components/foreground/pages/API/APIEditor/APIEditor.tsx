@@ -75,13 +75,13 @@ export default defineComponent({
                     leaveToClass="translate-x-full"
                 >
                     <div v-show={rightSidebarOpen.value} class={cn(
-                        "fixed right-0 top-0 h-full w-80",
+                        "fixed right-0 top-0 h-full w-1/3",
                         "border-l border-gray-200 dark:border-gray-700",
                         "bg-white dark:bg-gray-800",
-                        "z-10"
+                        "z-[100]"
                     )}>
                         <div class={cn("p-4")}>
-                            <h2 class={cn("text-lg font-semibold text-gray-800 dark:text-gray-200")}>Details</h2>
+                            <h2 class={cn("text-lg font-semibold text-gray-800 dark:text-gray-200")}>API Log</h2>
                         </div>
                         <button onClick={() => rightSidebarOpen.value = false} class={cn(
                             "absolute -left-3 top-1/2 transform -translate-y-1/2",

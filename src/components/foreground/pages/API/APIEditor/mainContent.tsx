@@ -1,4 +1,4 @@
-import { defineComponent, onMounted, Ref, ref } from 'vue';
+import { defineComponent, onMounted, provide, Ref, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { cn, convertBooleanNumber, convertMonacoValue, deepClone, generateUuid } from '@/utils/index';
 import { LEFT_SIDEBAR_WIDTH, MIN_HEIGHT_PREPROCESSING_EDITOR, API_METHOD, API_STEP } from '@/constants';
@@ -62,6 +62,14 @@ export default defineComponent({
         const isShowPreprocessingEditor = ref(false);
         const isShowPostprocessingEditor = ref(false);
         const isShowExcuteResultEditor = ref(true);
+
+
+        // provide
+        provide('APIEditorPage_EnableLoading',{
+            changeLoading: (val: boolean) => {
+                loading.value = val;
+            }
+        });
 
         const getMethodStyles = (method: string) => {
             const styles = {

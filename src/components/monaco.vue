@@ -32,6 +32,8 @@ monaco.languages.register({ id: "html" });
 monaco.languages.register({ id: "css" });
 monaco.languages.register({ id: "javascript" });
 monaco.languages.register({ id: "typescript" });
+monaco.languages.register({ id: "sql" });
+monaco.languages.register({ id: "json" });
 
 monaco.languages.onLanguage("html", () => {
     monaco.languages.html.htmlDefaults.setOptions({
@@ -65,6 +67,7 @@ monaco.languages.onLanguage("typescript", () => {
         noSyntaxValidation: false,
     });
 });
+
 
 export default {
     name: "MonacoEditor",
@@ -264,10 +267,8 @@ docs: https://github.com`,
         };
 
         const formatCode = function () {
-            const formatAction = editor.getAction(
-                "editor.action.formatDocument"
-            );
-            formatAction.run();
+            editor.getPosition();
+            editor.getAction("editor.action.formatDocument").run();
         };
 
         // 改变编辑器内的内容
@@ -284,6 +285,7 @@ docs: https://github.com`,
             editorRef,
             getContentValue,
             setContentValue,
+            formatCode,
         };
     },
 };

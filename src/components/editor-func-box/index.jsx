@@ -1,6 +1,7 @@
 import { defineComponent, computed } from "vue";
 import { FullScreen, DocumentCopy, CaretLeft } from "@element-plus/icons-vue";
 import RunIcon from "@/components/foreground/icon/Run.tsx";
+import FormatCodeIcon from "@/components/foreground/icon/FormatCode.tsx";
 export const props = {
     name: {
         type: [String],
@@ -38,6 +39,10 @@ export const props = {
         type: [Boolean],
         default: false,
     },
+    isShowFormatCode: {
+        type: [Boolean],
+        default: false,
+    },
     isFold: {
         type: [Boolean],
         default: false,
@@ -50,10 +55,11 @@ export const props = {
 
 export default defineComponent({
     name: "editor-func-box",
-    emits: ["onCopy", "onFullPage", "onFold", "onRun"],
+    emits: ["onCopy", "onFullPage", "onFold", "onRun", "onFormatCode"],
     props,
     components: {
         RunIcon,
+        FormatCodeIcon,
     },
     setup(props, ctx) {
         const nameBridge = computed(() => props.name);
@@ -74,6 +80,7 @@ export default defineComponent({
         const fullPage = () => ctx.emit("onFullPage");
         const fold = (isFold) => ctx.emit("onFold", isFold);
         const run = () => ctx.emit("onRun");
+        const formatCode = () => ctx.emit("onFormatCode");
         return () => (
             <div class="editor-func-box">
                 {
@@ -105,6 +112,11 @@ export default defineComponent({
                     <div class="footer">
                         <span class="mtk mtk3"> {"}"} </span>
                         <div>
+                            {props.isShowFormatCode && (
+                                <el-icon class="btn formatCode" onClick={formatCode}>
+                                    {<FormatCodeIcon />}
+                                </el-icon>
+                            )}
                             {props.isShowRun && (
                                 <el-icon class="btn run" onClick={run}>
                                     {<RunIcon />}

@@ -84,7 +84,7 @@ export default defineComponent({
                 >
                     {props.isOpen && (
                         <div class={cn(
-                            "fixed z-[99] flex items-center justify-center",
+                            "fixed z-[99] flex items-center justify-center w-full",
                             "left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
                         )}>
                             <div

@@ -12,7 +12,11 @@ import {
     APIExecutePreview,
     AddAPIModule,
     APIModuleBindindUnits,
-    DeleteAPIModuleDataUnits
+    DeleteAPIModuleDataUnits,
+    APIModuleDataUnitEnabled,
+    SqlDataUnitList,
+    MockDataUnitList,
+    BoundDataUnit
 } from '@/api';
 
 
@@ -183,6 +187,30 @@ const _DeleteAPIModuleDataUnits = (params) => {
     return DeleteAPIModuleDataUnits(params)
 };
 
+// 启用/禁用接口绑定的数据单元
+const _APIModuleDataUnitEnabled = (params) => {
+    return APIModuleDataUnitEnabled(params)
+};
+
+/**
+ * 获取数据单元列表
+ * @param type 1 SQL 2 Mock
+ * @param params 参数
+ * @returns 
+ */
+const _GetDataUnitList = (type: string, params: any): any => {
+    if (type === "1") {
+        return SqlDataUnitList(params)
+    } else if (type === "2") {
+        return MockDataUnitList(params)
+    }
+};
+
+// 绑定数据单元
+const _BoundDataUnit = (params) => {
+    return BoundDataUnit(params)
+};
+
 export default {
     _APIModuleList,
     _APIInfo,
@@ -197,5 +225,8 @@ export default {
     _APIExecutePreview,
     _AddAPIModule,
     _APIModuleBindindUnits,
-    _DeleteAPIModuleDataUnits
+    _DeleteAPIModuleDataUnits,
+    _APIModuleDataUnitEnabled,
+    _GetDataUnitList,
+    _BoundDataUnit
 }

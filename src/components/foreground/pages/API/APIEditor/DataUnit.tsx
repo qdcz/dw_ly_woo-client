@@ -1,4 +1,4 @@
-import { defineComponent, nextTick, onMounted, ref } from "vue";
+import { defineComponent, inject, nextTick, onMounted, Ref, ref } from "vue";
 import { useRoute } from "vue-router";
 import Sortable from 'sortablejs';
 // lib
@@ -12,6 +12,7 @@ import APIs from "../APIs";
 import Switch from "@/components/foreground/form/Switch";
 import Confirm from "@/components/foreground/dialog/confirm";
 import BindDataUnitDialog from "./BindDataUnitDialog";
+import RunDataUnitDialog from "./RunDataUnitDialog";
 
 // icon
 import DeleteIcon from "@/components/foreground/icon/Delete";
@@ -28,6 +29,7 @@ export default defineComponent({
         Switch,
         Confirm,
         BindDataUnitDialog,
+        RunDataUnitDialog,
         DeleteIcon,
         RunIcon,
         MultipleIcon,
@@ -42,9 +44,16 @@ export default defineComponent({
         const ConfirmTitle = ref<string>("Tip");
         const ConfirmMessage = ref<string>("Are you sure you want to save the changes?");
 
+        // cache need delete data unit id
         let NeedToDeleteDataUnitId: string = "";
+        let NeedToRunDataUnit: Object = {};
 
         const IsShowBindDataUnitDialog = ref<boolean>(false);
+        const IsShowRunDataUnitDialog = ref<boolean>(false);
+
+
+        // inject
+        const loading = inject('APIEditorPage_EnableLoading') as any;
 
         const formatterMStatus = (row: any) => row.m_status == 0 ? true : false; // 0:启用 1:禁用;
 
@@ -58,15 +67,16 @@ export default defineComponent({
             if (res.code === 200) {
                 dataUnitList.value = res.data.dataUnits;
                 dataUnitList.value.forEach((item: any) => item.m_status = formatterMStatus(item));
-                console.log("dataUnitList", dataUnitList.value);
                 nextTick(() => {
                     setTimeout(() => {
                         dataUnitListSortable.value = Sortable.create(document.getElementById('BindingDataUnitList'), {
                             animation: 250,
                             handle: '.DataUnitDrag',
                             onEnd: () => {
-                                updateConfirmDialogStatus(true, "Tip", "Are you sure you want to save the current order?");
-                                CurrentComfirmType.value = "save";
+                                if (dataUnitListSortable.value.toArray().length > 1) {
+                                    updateConfirmDialogStatus(true, "Tip", "Are you sure you want to save the current order?");
+                                    CurrentComfirmType.value = "save";
+                                }
                             }
                         });
                     }, 100);
@@ -87,7 +97,15 @@ export default defineComponent({
         const updateMStatus = (data: any, value: boolean) => {
             dataUnitList.value.forEach((item: any) => {
                 if (data.id === item.id) {
-                    item.m_status = value
+                    item.m_status = value;
+                    loading.changeLoading(true);
+                    APIs._APIModuleDataUnitEnabled({
+                        m_id: data.m_id,
+                        status: value ? 0 : 1
+                    }).finally(() => {
+                        ElMessage.success("Update success");
+                        loading.changeLoading(false);
+                    });
                 }
             });
         };
@@ -95,6 +113,11 @@ export default defineComponent({
         const saveDataUnitSort = () => {
             IsShowSortConfirmDialog.value = false;
             console.log("saveDataUnitSort");
+        };
+
+        const runDataUnit = (data: Ref<any>) => {
+            IsShowRunDataUnitDialog.value = true;
+            NeedToRunDataUnit = data;
         };
 
         const deleteDataUnit = (data: any) => {
@@ -112,10 +135,26 @@ export default defineComponent({
                     ElMessage.success("Delete success");
                     IsShowSortConfirmDialog.value = false;
                     getAPIModuleBindindUnits();
+                    NeedToDeleteDataUnitId = "";
                 });
             } else if (confirmType === "save") {
                 saveDataUnitSort();
             }
+        };
+
+        const addBindDataUnit = (row: any) => {
+            // 1:sql data unit 2:mock data unit
+            const unitType = row.ItemData.hasOwnProperty("sql") ? 1 : row.ItemData.hasOwnProperty("schema") ? 2 : 0;
+
+            APIs._BoundDataUnit({
+                apiId: route.query.id,
+                unitId: row.ItemData.id,
+                status: 1,
+                unitType
+            }).then((res: any) => {
+                ElMessage.success(res.data);
+                getAPIModuleBindindUnits();
+            });
         };
 
 
@@ -128,12 +167,24 @@ export default defineComponent({
                 <Confirm title={ConfirmTitle.value} message={ConfirmMessage.value}
                     isOpen={IsShowSortConfirmDialog.value} onCancel={() => IsShowSortConfirmDialog.value = false} onConfirm={handleConfirm}
                 />
-                <BindDataUnitDialog title="Bind Data Unit" isOpen={IsShowBindDataUnitDialog.value} onClose={() => IsShowBindDataUnitDialog.value = false} />
+                <BindDataUnitDialog title="Bind Data Unit"
+                    isOpen={IsShowBindDataUnitDialog.value}
+                    onClose={() => IsShowBindDataUnitDialog.value = false}
+                    onAddBindDataUnit={addBindDataUnit}
+                />
+                <RunDataUnitDialog title="Run Or Preview Data Unit"
+                    dataUnit={NeedToRunDataUnit}
+                    isOpen={IsShowRunDataUnitDialog.value}
+                    onClose={() => IsShowRunDataUnitDialog.value = false}
+                />
 
 
                 <div class={cn("text-lg font-bold", "dark:text-gray-300", "flex justify-between")}>
-                    <span class={cn("text-base")}>Used to bind data units to interfaces</span>
-                    <span><AddIcon width="6" height="6" hoverClass="hover:text-black dark:hover:text-blue-500 hover:scale-110" onClick={() => IsShowBindDataUnitDialog.value = true} /></span>
+                    <span class={cn("text-base")}>Used to bind data units to interfaces </span>
+                    <div class={cn("flex flex-row items-center gap-1")}>
+                        👉
+                        <span><AddIcon width="6" height="6" hoverClass="hover:text-black dark:hover:text-blue-500 hover:scale-110" onClick={() => IsShowBindDataUnitDialog.value = true} /></span>
+                    </div>
                 </div>
 
                 <div id="BindingDataUnitList" class={cn(
@@ -144,7 +195,7 @@ export default defineComponent({
                     "bg-gray-100 dark:bg-gray-800",
                     "text-center"
                 )}>
-                    {dataUnitList.value.map((item: any, index: number) => (
+                    {dataUnitList.value.map((item: any) => (
                         <div class={cn(
                             "flex flex-wrap items-center justify-between",
                         )}>
@@ -164,7 +215,7 @@ export default defineComponent({
                                 <Switch modelValue={item.m_status} onUpdate:modelValue={updateMStatus.bind(null, item)} />
                             </div>
                             <div class={cn("w-1/8 p-2 flex items-center gap-2")}>
-                                <RunIcon width="5" height="5" />
+                                <RunIcon width="5" height="5" onClick={runDataUnit.bind(null, item)} />
                                 <DeleteIcon width="5" height="5" onClick={deleteDataUnit.bind(null, item)} />
                             </div>
                         </div>

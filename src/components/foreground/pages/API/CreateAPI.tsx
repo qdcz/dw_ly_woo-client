@@ -5,6 +5,7 @@ import { cn } from '@/utils';
 import Input from '@/components/foreground/form/Input.tsx';
 import Select from '@/components/foreground/form/Select.tsx';
 import Form from '@/components/foreground/form/Form.tsx';
+import ComfirmButton from '@/components/foreground/form/ComfirmButton.tsx';
 import APIs from './APIs';
 import { API_METHOD, API_STEP } from '@/constants';
 import { ElMessage } from 'element-plus';
@@ -25,7 +26,8 @@ export default defineComponent({
         PublicDialog,
         Input,
         Select,
-        Form
+        Form,
+        ComfirmButton
     },
     emits: ['refresh'],
     setup(props, { emit }) {
@@ -186,20 +188,7 @@ export default defineComponent({
                         </>
                     ),
                     footer: () => (
-                        <button
-                            type="button"
-                            class={cn(
-                                "inline-flex justify-center rounded-md",
-                                "border border-transparent",
-                                "transition-all duration-300 ease-linear",
-                                "bg-indigo-600 hover:bg-indigo-800",
-                                "px-4 py-2 text-sm font-medium text-white",
-                                "hover:outline-none hover:ring-2 hover:ring-offset-2 hover:ring-indigo-500 dark:hover:ring-offset-gray-800"
-                            )}
-                            onClick={onConfirm}
-                        >
-                            Confirm
-                        </button>
+                        <ComfirmButton text="Confirm" onClick={onConfirm} />
                     )
                 }}
             </PublicDialog>
