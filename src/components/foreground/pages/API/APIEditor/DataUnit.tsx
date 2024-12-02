@@ -172,7 +172,7 @@ export default defineComponent({
                     onClose={() => IsShowBindDataUnitDialog.value = false}
                     onAddBindDataUnit={addBindDataUnit}
                 />
-                <RunDataUnitDialog title="Run Or Preview Data Unit"
+                <RunDataUnitDialog title="Run Or Preview Data Unit ( Read Only ) "
                     dataUnit={NeedToRunDataUnit}
                     isOpen={IsShowRunDataUnitDialog.value}
                     onClose={() => IsShowRunDataUnitDialog.value = false}

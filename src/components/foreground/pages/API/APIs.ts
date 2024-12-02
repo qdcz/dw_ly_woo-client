@@ -16,7 +16,8 @@ import {
     APIModuleDataUnitEnabled,
     SqlDataUnitList,
     MockDataUnitList,
-    BoundDataUnit
+    BoundDataUnit,
+    SQLResult
 } from '@/api';
 
 
@@ -211,6 +212,11 @@ const _BoundDataUnit = (params) => {
     return BoundDataUnit(params)
 };
 
+// 执行sql
+const _SqlResult = (params) => {
+    return SQLResult(params)
+};
+
 export default {
     _APIModuleList,
     _APIInfo,
@@ -228,5 +234,6 @@ export default {
     _DeleteAPIModuleDataUnits,
     _APIModuleDataUnitEnabled,
     _GetDataUnitList,
-    _BoundDataUnit
+    _BoundDataUnit,
+    _SqlResult
 }

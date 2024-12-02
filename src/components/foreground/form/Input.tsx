@@ -1,4 +1,4 @@
-import { defineComponent, inject } from 'vue';
+import { defineComponent, inject, nextTick, ref } from 'vue';
 import { cn } from '@/utils/tailwindcss';
 import { FORM_INJECTION_KEY } from '@/tokens';
 
@@ -38,6 +38,8 @@ export default defineComponent({
         // 表单的验证错误信息
         const checkError = inject(FORM_INJECTION_KEY)?.checkError;
 
+        const isFocused = ref(false);
+
         const handleInput = (event: Event) => {
             const target = event.target as HTMLInputElement;
             emit('update:modelValue', target.value);
@@ -45,15 +47,21 @@ export default defineComponent({
         };
 
         const handleFocus = (event: FocusEvent) => {
-            (event.target as HTMLElement).classList.add('shadow-ly_inputActive');
-            if (document.documentElement.classList.contains('dark')) {
-                (event.target as HTMLElement).classList.add('shadow-ly_inputActive__dark');
-            }
+            isFocused.value = true;
+            nextTick(() => {
+                (event.target as HTMLElement).classList.add('shadow-ly_inputActive');
+                if (document.documentElement.classList.contains('dark')) {
+                    (event.target as HTMLElement).classList.add('shadow-ly_inputActive__dark');
+                }
+            })
         };
 
         const handleBlur = (event: FocusEvent) => {
-            (event.target as HTMLElement).classList.remove('shadow-ly_inputActive');
-            (event.target as HTMLElement).classList.remove('shadow-ly_inputActive__dark');
+            isFocused.value = false;
+            nextTick(() => {
+                (event.target as HTMLElement).classList.remove('shadow-ly_inputActive');
+                (event.target as HTMLElement).classList.remove('shadow-ly_inputActive__dark');
+            })
         };
 
         const handleKeyPress = (event: KeyboardEvent) => {
@@ -79,7 +87,7 @@ export default defineComponent({
                             "w-full h-full px-3 py-1.5 text-sm rounded",
                             "outline-none border-0 bg-transparent", // 消除默认边框和背景样式
                             "text-gray-800 dark:text-gray-200",
-                            props.bordered && "border border-gray-200 dark:border-gray-700",
+                            props.bordered && !isFocused.value && "shadow-ly_border dark:shadow-ly_border_dark",
                             "transition duration-200 ease-in",
                             props.disabled && "opacity-50 cursor-not-allowed",
                             !props.disabled && "cursor-text",
