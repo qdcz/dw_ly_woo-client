@@ -72,7 +72,7 @@ export default defineComponent({
         };
 
         return () => (
-            <>
+            <div class="relative w-full h-full">
                 {props.type === 'input' ? (
                     <input
                         type="text"
@@ -117,10 +117,10 @@ export default defineComponent({
                 )}
 
                 {/* field check error */}
-                <div class={cn("text-red-500 text-xs mt-1 ml-2 transition-all duration-300 ease-linear")}>
+                <div class={cn("text-red-500 text-xs mt-2 transition-all duration-300 ease-linear")}>
                     {checkError?.value[props.prop]}
                 </div>
-            </>
+            </div>
 
 
         );

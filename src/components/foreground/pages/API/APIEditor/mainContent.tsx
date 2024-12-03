@@ -101,11 +101,11 @@ export default defineComponent({
         const paramsDataChange = async (type: string, val: any, enableHaderRealTimeSync: Ref<boolean>) => {
             type == 'headers' ? APIRequestHeaderInfo.value = val : "";
             type == 'bodys' ? APIRequestBodyInfo.value = val : "";
-
+            
             if (enableHaderRealTimeSync.value) {
                 const schemas = {
                     headerSchema: JSON.stringify(
-                        APIRequestHeaderInfo.value.map(
+                        (APIRequestHeaderInfo.value || []).map(
                             (rowData) => {
                                 return {
                                     id: rowData[0].id || generateUuid(),
@@ -118,7 +118,7 @@ export default defineComponent({
                         )
                     ),
                     bodySchema: JSON.stringify(
-                        APIRequestBodyInfo.value.map((rowData) => {
+                        (APIRequestBodyInfo.value || []).map((rowData) => {
                             return {
                                 id: rowData[0].id || generateUuid(),
                                 type: rowData[1].value,

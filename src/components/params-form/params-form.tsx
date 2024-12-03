@@ -158,7 +158,7 @@ export default defineComponent({
                         </div>
                     ))}
 
-                    <div class={cn("px-2")}>
+                    <div class={cn("h-full p-2", "shadow-ly_border dark:shadow-ly_border_dark")}>
                         <Circle
                             class={cn("cursor-pointer select-none")}
                             width="20px"

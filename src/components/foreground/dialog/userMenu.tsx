@@ -6,6 +6,8 @@ import { toggleDarkMode } from '../../../utils'
 
 import UserIcon from "../icon/User.tsx";
 import LogoutIcon from "../icon/Logout.tsx";
+import LightIcon from "../icon/Light.tsx";
+import DarkIcon from "../icon/Dark.tsx";
 
 export default defineComponent({
     name: "UserMenu",
@@ -22,7 +24,9 @@ export default defineComponent({
     components: {
         Confirm,
         LogoutIcon,
-        UserIcon
+        UserIcon,
+        LightIcon,
+        DarkIcon
     },
     setup(props) {
         const isConfirmOpen = ref(false);
@@ -38,23 +42,27 @@ export default defineComponent({
             userStore.logout();
         }
 
-        const MenuItems = [
+        const MenuItems = ref<{ icon: any, text: string, onClick: () => void }[]>([
             {
                 icon: UserIcon,
                 text: "User Info",
                 onClick: () => { }
             },
             {
-                icon: UserIcon,
-                text: "Theme Toggle",
-                onClick: () => { toggleDarkMode() }
+                icon: LightIcon,
+                text: "Light Mode",
+                onClick: () => {
+                    const theme = toggleDarkMode();
+                    MenuItems.value[1].icon = theme === "light" ? DarkIcon : LightIcon;
+                    MenuItems.value[1].text = theme === "light" ? "Dark Mode" : "Light Mode";
+                }
             },
             {
                 icon: LogoutIcon,
                 text: "Logout",
                 onClick: onLogoutClick
             }
-        ]
+        ])
 
         return () => (
             <>
@@ -74,14 +82,14 @@ export default defineComponent({
                 {/* 用户菜单 */}
                 {(<div
                     class={cn(
-                        "absolute z-[99] w-60 bottom-[80px] left-4 p-4",
+                        "absolute z-[99] w-60 bottom-[80px] left-4 p-4 select-none",
                         "bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-lg",
                         "transform transition-all duration-200 ease-out",
                         "hover:scale-[1.02] hover:shadow-xl",
                         props.isOpen ? "opacity-100 scale-100 translate-y-0 pointer-events-auto" : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
                     )}
                 >
-                    {MenuItems.map(item => (
+                    {MenuItems.value.map(item => (
                         <div
                             class={cn(
                                 "flex items-center p-2 rounded-lg cursor-pointer",
@@ -90,7 +98,7 @@ export default defineComponent({
                             )}
                             onClick={item.onClick}
                         >
-                            <item.icon />
+                            <item.icon width="1.3" height="2" />
                             <span class={cn("ml-3")}>{item.text}</span>
                         </div>
                     ))}

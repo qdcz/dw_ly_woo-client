@@ -19,6 +19,7 @@ export const toggleDarkMode = (theme: string = 'light') => {
 
     html.classList.toggle('dark', targetTheme === 'dark');
     localStorage.setItem('darkMode', targetTheme);
+    return targetTheme;
 }
 
 /**

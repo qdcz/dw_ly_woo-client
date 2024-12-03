@@ -96,7 +96,7 @@ export default defineComponent({
                                 {sqlParams.value.map((i: any) => (
                                     <div class="flex items-center py-2">
                                         <span class="mr-2 text-sm">{i.key}</span>
-                                        <Input bordered={true} key={i.key} modelValue={i.value} onUpdate:modelValue={(value: string) => {
+                                        <Input class="mr-1" bordered={true} key={i.key} modelValue={i.value} onUpdate:modelValue={(value: string) => {
                                             i.value = value;
                                         }} placeholder={"input your parameter"} />
                                     </div>

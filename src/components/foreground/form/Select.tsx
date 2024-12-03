@@ -72,7 +72,7 @@ export default defineComponent({
         };
 
         return () => (
-            <div ref={selectRef} class="relative w-full">
+            <div ref={selectRef} class="relative w-full h-full">
                 <button
                     type="button"
                     onClick={toggleDropdown}
