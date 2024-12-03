@@ -6,6 +6,7 @@ import APIs from '@/components/foreground/pages/API/APIs';
 import { ElMessage } from 'element-plus';
 import MonacoEditor from '@/components/monaco.vue';
 import editorFuncBox from '@/components/editor-func-box/index.jsx';
+import Switch from '@/components/foreground/form/Switch';
 import APIHeader from './APIHeader';
 import APIBody from './APIBody';
 import DataUnit from './DataUnit';
@@ -25,7 +26,8 @@ export default defineComponent({
         editorFuncBox,
         APIHeader,
         APIBody,
-        DataUnit
+        DataUnit,
+        Switch
     },
     setup(props) {
         const route = useRoute();
@@ -35,7 +37,7 @@ export default defineComponent({
         const preprocessingEditForm = ref(deepClone(defaultPrePostprocessingForm));
         const postprocessingEditForm = ref(deepClone(defaultPrePostprocessingForm));
         const excuteResultEditForm = ref<string | null>(null);
-
+        const isOpenProcessingFunctionLog = ref(false);
         /**
          * component ref
          */
@@ -65,7 +67,7 @@ export default defineComponent({
 
 
         // provide
-        provide('APIEditorPage_EnableLoading',{
+        provide('APIEditorPage_EnableLoading', {
             changeLoading: (val: boolean) => {
                 loading.value = val;
             }
@@ -101,7 +103,7 @@ export default defineComponent({
         const paramsDataChange = async (type: string, val: any, enableHaderRealTimeSync: Ref<boolean>) => {
             type == 'headers' ? APIRequestHeaderInfo.value = val : "";
             type == 'bodys' ? APIRequestBodyInfo.value = val : "";
-            
+
             if (enableHaderRealTimeSync.value) {
                 const schemas = {
                     headerSchema: JSON.stringify(
@@ -188,6 +190,10 @@ export default defineComponent({
 
                 const params = {};
                 const headers = {};
+                if (isOpenProcessingFunctionLog.value) {
+                    headers['X-Woo-Processing-Log'] = true;
+                    // params['___hooklogger'] = true;
+                }
                 if (APIRequestHeaderInfo.value) {
                     APIRequestHeaderInfo.value.forEach((rowData) => {
                         headers[rowData[0].value] = rowData[1].value;
@@ -240,6 +246,7 @@ export default defineComponent({
             apiCall.then((res: any) => {
                 if (res.code === 200) {
                     ElMessage.success(`保存${type === 'preprocessing' ? '预处理' : '后处理'}函数成功`);
+                    getProcessingFunction(type);
                 }
             });
 
@@ -280,11 +287,14 @@ export default defineComponent({
                         {!loading.value && (
                             <editorFuncBox
                                 name={type}
-                                paramString={type === 'excuteResult' ? '' : 'params, utils, plugin'}
+                                paramString={type === 'excuteResult' ? '' : (
+                                    type === 'preprocessing' ? 'params, utils, plugin' : 'data, params, utils, plugin'
+                                )}
                                 isShowCopy={true}
                                 isShowFullPage={true}
                                 isShowFold={true}
                                 isShowRun={type === 'excuteResult'}
+                                bottomTip={type !== 'excuteResult' ? 'Hold 【ctrl + s】 to save' : ''}
                                 class={cn(
                                     `w-full min-h-[${MIN_HEIGHT_PREPROCESSING_EDITOR}px] rounded-lg overflow-hidden`,
                                     "border border-gray-200 dark:border-gray-700",
@@ -344,6 +354,30 @@ export default defineComponent({
             APIRequestBodyId.value = APIModuleBindRequestResult.id
         }
 
+        // 获取前后处理函数
+        const getProcessingFunction = async (type: 'preprocessing' | 'postprocessing') => {
+            const hookType = type === 'preprocessing' ? 1 : 2;
+            APIs._GetAPIModuleHook({ apiId: route.query.id as string, hookType }).then((res: any) => {
+                if (res.code === 200) {
+                    if (res.data.length > 0) {
+                        hookType === 1 ?
+                            preprocessingEditForm.value = res.data[0] :
+                            postprocessingEditForm.value = res.data[0];
+                    } else {
+                        hookType === 1 ?
+                            preprocessingEditForm.value = deepClone(defaultPrePostprocessingForm) :
+                            postprocessingEditForm.value = deepClone(defaultPrePostprocessingForm);
+                    }
+                }
+            }).finally(() => {
+                setTimeout(() => {
+                    hookType === 1 ?
+                        preprocessingLoading.value = false :
+                        postprocessingLoading.value = false;
+                }, 1000);
+            });
+        }
+
         onMounted(() => {
             APIs._APIInfo({ id: route.query.id as string }).then((res: any) => {
                 if (res.code === 200) {
@@ -355,33 +389,8 @@ export default defineComponent({
                 }, 300);
             });
 
-            APIs._GetAPIModuleHook({ apiId: route.query.id as string, hookType: 1 }).then((res: any) => {
-                if (res.code === 200) {
-                    if (res.data.length > 0) {
-                        preprocessingEditForm.value = res.data[0];
-                    } else {
-                        preprocessingEditForm.value = deepClone(defaultPrePostprocessingForm);
-                    }
-                }
-            }).finally(() => {
-                setTimeout(() => {
-                    preprocessingLoading.value = false;
-                }, 1000);
-            });
-
-            APIs._GetAPIModuleHook({ apiId: route.query.id as string, hookType: 2 }).then((res: any) => {
-                if (res.code === 200) {
-                    if (res.data.length > 0) {
-                        postprocessingEditForm.value = res.data[0];
-                    } else {
-                        postprocessingEditForm.value = deepClone(defaultPrePostprocessingForm);
-                    }
-                }
-            }).finally(() => {
-                setTimeout(() => {
-                    postprocessingLoading.value = false;
-                }, 1000);
-            });
+            getProcessingFunction('preprocessing');
+            getProcessingFunction('postprocessing');
 
             getAPIRequest();
         });
@@ -491,6 +500,13 @@ export default defineComponent({
                             )}
                             {activeTab.value === 'Processing Function' && (
                                 <div class={cn("p-4")}>
+                                    <div class={cn("flex items-center pb-4")}>
+                                        <span class={cn("text-base font-bold mr-2")}>Enable Logging for Processing Function</span>
+                                        <Switch
+                                            modelValue={isOpenProcessingFunctionLog.value}
+                                            onUpdate:modelValue={(value: boolean) => isOpenProcessingFunctionLog.value = value}
+                                        />
+                                    </div>
                                     {/* 前后置函数部分 */}
                                     <div class={cn("flex gap-4")}>
                                         {/* 前置函数 */}

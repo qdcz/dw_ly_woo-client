@@ -80,6 +80,8 @@ export const APIExecutePreview = (
     return request.post(
         "/api/" + eName + "/" + apiId,
         { ...data },
-        { headers }
+        {
+            headers,
+        }
     );
 };

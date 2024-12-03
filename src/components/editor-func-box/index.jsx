@@ -43,6 +43,10 @@ export const props = {
         type: [Boolean],
         default: false,
     },
+    bottomTip: {
+        type: [String],
+        default: "",
+    },
     isFold: {
         type: [Boolean],
         default: false,
@@ -111,6 +115,9 @@ export default defineComponent({
                 {props.footer && !props.isFold && (
                     <div class="footer">
                         <span class="mtk mtk3"> {"}"} </span>
+                        {props.bottomTip && (
+                            <div class="bottom-tip">{props.bottomTip}</div>
+                        )}
                         <div>
                             {props.isShowFormatCode && (
                                 <el-icon class="btn formatCode" onClick={formatCode}>

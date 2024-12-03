@@ -61,6 +61,13 @@
         & .btn:hover {
             color: rgb(40, 181, 221);
         }
+
+        & .bottom-tip {
+            display: flex;
+            align-items: center;
+            color: #ccc;
+            font-size: 0.8rem;
+        }
     }
 
     // 折叠封面

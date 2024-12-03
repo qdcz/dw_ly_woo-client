@@ -2,7 +2,9 @@
 
 woo-server 是一个便于用户快速创建API和数据管理的系统，可视化配置操作，支持离线部署部署。
 
-在线地址: https://www.dwly.site:4999/static/admin
+在线地址: https://www.dwly.site:4999/static/admin   账号: admin 密码: admin
+
+第一次进入需要点接口验证跳过 https的不安全请求。
 
 # 项目遇到的问题
 
