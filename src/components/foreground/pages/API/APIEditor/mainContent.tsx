@@ -7,6 +7,7 @@ import { ElMessage } from 'element-plus';
 import MonacoEditor from '@/components/monaco.vue';
 import editorFuncBox from '@/components/editor-func-box/index.jsx';
 import Switch from '@/components/foreground/form/Switch';
+import Tab from '@/components/foreground/other/tab'
 import APIHeader from './APIHeader';
 import APIBody from './APIBody';
 import DataUnit from './DataUnit';
@@ -27,7 +28,8 @@ export default defineComponent({
         APIHeader,
         APIBody,
         DataUnit,
-        Switch
+        Switch,
+        Tab
     },
     setup(props) {
         const route = useRoute();
@@ -38,6 +40,12 @@ export default defineComponent({
         const postprocessingEditForm = ref(deepClone(defaultPrePostprocessingForm));
         const excuteResultEditForm = ref<string | null>(null);
         const isOpenProcessingFunctionLog = ref(false);
+        const tabList = [
+            { id: "headers", name: "Headers" },
+            { id: "params", name: "Params" },
+            { id: "dataUnit", name: "Data Unit" },
+            { id: "processingFunction", name: "Processing Function" },
+        ]
         /**
          * component ref
          */
@@ -449,25 +457,8 @@ export default defineComponent({
 
                     {/* 请求头、参数、数据单元、处理函数切换部分 */}
                     <div class={cn("mt-8")}>
-                        <div class={cn("flex border-b border-gray-200 dark:border-gray-700")}>
-                            {['Headers', 'Params', "Data Unit", 'Processing Function'].map(tab => (
-                                <div
-                                    class={cn(
-                                        "px-4 py-2 cursor-pointer",
-                                        "border-b-2 transition-colors duration-300",
-                                        activeTab.value === tab
-                                            ? "border-blue-500 text-blue-600"
-                                            : "border-transparent hover:border-gray-300"
-                                    )}
-                                    onClick={() => activeTab.value = tab}
-                                >
-                                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                                </div>
-                            ))}
-                        </div>
-
-                        <div>
-                            {activeTab.value === 'Headers' && (
+                        <Tab options={tabList} active={activeTab} onActive={(id: string) => activeTab.value = id}>
+                            {activeTab.value === 'headers' && (
                                 <div class={cn("p-4")}>
                                     <div class={cn("text-lg font-bold")}>
                                         <APIHeader
@@ -479,7 +470,7 @@ export default defineComponent({
                                     </div>
                                 </div>
                             )}
-                            {activeTab.value === 'Params' && (
+                            {activeTab.value === 'params' && (
                                 <div class={cn("p-4")}>
                                     <div class={cn("text-lg font-bold")}>
                                         <APIBody
@@ -491,14 +482,14 @@ export default defineComponent({
                                     </div>
                                 </div>
                             )}
-                            {activeTab.value === 'Data Unit' && (
+                            {activeTab.value === 'dataUnit' && (
                                 <div class={cn("p-4")}>
                                     <div class={cn("text-lg font-bold")}>
                                         <DataUnit />
                                     </div>
                                 </div>
                             )}
-                            {activeTab.value === 'Processing Function' && (
+                            {activeTab.value === 'processingFunction' && (
                                 <div class={cn("p-4")}>
                                     <div class={cn("flex items-center pb-4")}>
                                         <span class={cn("text-base font-bold mr-2")}>Enable Logging for Processing Function</span>
@@ -538,10 +529,8 @@ export default defineComponent({
                                     </div>
                                 </div>
                             )}
-                        </div>
+                        </Tab>
                     </div>
-
-
 
 
                 </div>
@@ -563,7 +552,7 @@ export default defineComponent({
                         "border-b-2 border-blue-500"
                     )}></div>
                 </div>
-            </div>
+            </div >
         );
     }
 });
