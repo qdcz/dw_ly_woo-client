@@ -26,7 +26,7 @@ export function convertMonacoValue(data: any): any {
         let __data = data.logger ? data.data : data;
         if (data.logger) { // {logger:{},data:{}}
             ElMessage.success(
-                "检测出您已开启日志打印，请开启控制台查看！"
+                "检测出您已开启日志打印，请开启控制台或者在右侧面版查看！"
             );
             console.info(
                 "preprocessingLogger(预处理日志打印),postprocessingLogger(后处理日志打印)",
@@ -44,5 +44,6 @@ export function convertMonacoValue(data: any): any {
     }
     return {
         content,
+        logger: data?.logger || '[]'
     };
 }

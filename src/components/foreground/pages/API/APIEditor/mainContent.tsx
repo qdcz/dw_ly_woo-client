@@ -1,4 +1,4 @@
-import { defineComponent, onMounted, provide, Ref, ref } from 'vue';
+import { defineComponent, onMounted, provide, reactive, Ref, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { cn, convertBooleanNumber, convertMonacoValue, deepClone, generateUuid } from '@/utils/index';
 import { LEFT_SIDEBAR_WIDTH, MIN_HEIGHT_PREPROCESSING_EDITOR, API_METHOD, API_STEP } from '@/constants';
@@ -11,6 +11,8 @@ import Tab from '@/components/foreground/other/tab'
 import APIHeader from './APIHeader';
 import APIBody from './APIBody';
 import DataUnit from './DataUnit';
+import { ApiStore } from '@/store';
+import ComfirmButton from '@/components/foreground/form/ComfirmButton';
 
 const defaultPrePostprocessingForm = {
     id: '',
@@ -40,6 +42,7 @@ export default defineComponent({
         const postprocessingEditForm = ref(deepClone(defaultPrePostprocessingForm));
         const excuteResultEditForm = ref<string | null>(null);
         const isOpenProcessingFunctionLog = ref(false);
+        const apiStore = ApiStore();
         const tabList = [
             { id: "headers", name: "Headers" },
             { id: "params", name: "Params" },
@@ -214,7 +217,9 @@ export default defineComponent({
                 }
                 const response: any = await APIs._APIExecutePreview(eName, APIInfo.value.id, params, headers);
                 if (response.code === 200) {
-                    excuteResultEditForm.value = convertMonacoValue(response.data).content;
+                    const result = convertMonacoValue(response.data);
+                    excuteResultEditForm.value = result.content;
+                    apiStore.changeLoggerData(result.logger);
                 }
                 ElMessage.success('运行成功');
             } catch (e) {
@@ -401,13 +406,21 @@ export default defineComponent({
             getProcessingFunction('postprocessing');
 
             getAPIRequest();
+
+            activeTab.value = 'headers';
         });
 
         return () => (
             <div class={cn("text-gray-900 dark:text-gray-100 relative h-screen w-full")}>
                 {/* API Info */}
                 <div class={cn("p-4")}>
-                    <div class={cn("text-2xl font-bold")}>{APIInfo.value?.name}({APIInfo.value?.path})</div>
+                    <div class={cn("flex items-center justify-between")}>
+                        <div class={cn("text-2xl font-bold")}>{APIInfo.value?.name}({APIInfo.value?.path})</div>
+                        <ComfirmButton text="运行" onClick={() => {
+                            activeTab.value = 'processingFunction';
+                            handleRun('excuteResult');
+                        }}></ComfirmButton>
+                    </div>
                     <div class={cn("text-gray-600 dark:text-gray-400 mt-1 text-sm")}>{APIInfo.value?.description}</div>
                     <div class={cn("flex items-center space-x-2 mt-2")}>
                         <div class={cn(

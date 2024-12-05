@@ -1,9 +1,11 @@
 import { defineComponent, ref } from 'vue';
 import { cn } from '@/utils/index';
-import { useRouter } from 'vue-router';
+import { onBeforeRouteLeave, useRouter } from 'vue-router';
 
 import mainContent from './mainContent.tsx';
 import LoggerSideBar from './Logger.tsx';
+
+import { ApiStore } from '@/store/api/api';
 
 export default defineComponent({
     name: "APIEditor",
@@ -15,6 +17,11 @@ export default defineComponent({
     setup(props, { emit }) {
         const router = useRouter();
         const rightSidebarOpen = ref(false);
+        const apiStore = ApiStore();
+
+        onBeforeRouteLeave(() => {
+            apiStore.clearLoggerData('all');
+        });
 
         return () => (
             <div class={cn("relative")}>
