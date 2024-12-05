@@ -1,4 +1,4 @@
-import { defineComponent, onMounted, PropType, ref, Transition } from 'vue';
+import { defineComponent, PropType, ref, Transition } from 'vue';
 import { cn, } from '@/utils/index';
 import Tab from '@/components/foreground/other/tab.tsx';
 import { ApiStore } from '@/store';

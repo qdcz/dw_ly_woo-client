@@ -20,5 +20,5 @@ export const DATA_UNIT_TYPE = {
 };
 
 export const LEFT_SIDEBAR_WIDTH = 250;
-export const MIN_HEIGHT_PREPROCESSING_EDITOR = 400;
+export const MIN_HEIGHT_PREPROCESSING_EDITOR = 350;
 

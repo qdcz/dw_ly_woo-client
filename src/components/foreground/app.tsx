@@ -240,7 +240,7 @@ export default defineComponent({
 
                             {/* Main content */}
                             <main class={cn("flex-1 bg-white dark:bg-gray-900 px-4 lg:pr-4 lg:m-2 lg:rounded-lg lg:shadow-sm overflow-auto no-scrollbar")}>
-                                <div class={cn("my-8")}>
+                                <div class={cn("mt-8")}>
                                     <router-view></router-view>
                                 </div>
                             </main>

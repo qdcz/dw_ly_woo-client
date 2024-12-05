@@ -68,9 +68,7 @@ export default defineComponent({
                             </svg>
                         </button>
                     )}
-                    <div class={cn("p-6")}>
-                        <mainContent />
-                    </div>
+                    <mainContent />
                 </div>
 
                 {/* Right Sidebar */}

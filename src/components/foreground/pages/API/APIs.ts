@@ -17,7 +17,8 @@ import {
     SqlDataUnitList,
     MockDataUnitList,
     BoundDataUnit,
-    SQLResult
+    SQLResult,
+    DeleteAPIModule
 } from '@/api';
 
 
@@ -43,6 +44,11 @@ const _APIModuleList = (params) => {
 // 获取API详细信息
 const _APIInfo = (params) => {
     return APIModuleInfo(params)
+};
+
+// 删除API
+const _DeleteAPIModule = (params) => {
+    return DeleteAPIModule(params)
 };
 
 
@@ -220,6 +226,7 @@ const _SqlResult = (params) => {
 export default {
     _APIModuleList,
     _APIInfo,
+    _DeleteAPIModule,
     _GetAPIModuleHook,
     _APIModuleAddHook,
     _UpdateAPIModuleHook,

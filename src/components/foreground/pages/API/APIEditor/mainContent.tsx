@@ -1,5 +1,6 @@
-import { defineComponent, onMounted, provide, reactive, Ref, ref } from 'vue';
+import { defineComponent, onMounted, provide, Ref, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import router from '@/router';
 import { cn, convertBooleanNumber, convertMonacoValue, deepClone, generateUuid } from '@/utils/index';
 import { LEFT_SIDEBAR_WIDTH, MIN_HEIGHT_PREPROCESSING_EDITOR, API_METHOD, API_STEP } from '@/constants';
 import APIs from '@/components/foreground/pages/API/APIs';
@@ -13,6 +14,9 @@ import APIBody from './APIBody';
 import DataUnit from './DataUnit';
 import { ApiStore } from '@/store';
 import ComfirmButton from '@/components/foreground/form/ComfirmButton';
+import ComfirmDialog from '@/components/foreground/dialog/confirm';
+
+
 
 const defaultPrePostprocessingForm = {
     id: '',
@@ -31,7 +35,8 @@ export default defineComponent({
         APIBody,
         DataUnit,
         Switch,
-        Tab
+        Tab,
+        ComfirmDialog
     },
     setup(props) {
         const route = useRoute();
@@ -42,6 +47,7 @@ export default defineComponent({
         const postprocessingEditForm = ref(deepClone(defaultPrePostprocessingForm));
         const excuteResultEditForm = ref<string | null>(null);
         const isOpenProcessingFunctionLog = ref(false);
+        const isOpenDeleteAPIDialog = ref(false);
         const apiStore = ApiStore();
         const tabList = [
             { id: "headers", name: "Headers" },
@@ -265,6 +271,16 @@ export default defineComponent({
 
         };
 
+        const handleDelete = () => {
+            isOpenDeleteAPIDialog.value = false;
+            APIs._DeleteAPIModule(APIInfo.value.id).then((res: any) => {
+                if (res.code === 200) {
+                    ElMessage.success('删除成功');
+                    router.back();
+                }
+            });
+        };
+
         // 抽象处理函数编辑器组件
         const ProcessingEditor = ({ type, loading, func, editorRef, isShow }) => (
             <div class={cn(
@@ -411,161 +427,172 @@ export default defineComponent({
         });
 
         return () => (
-            <div class={cn("text-gray-900 dark:text-gray-100 relative h-screen w-full")}>
-                {/* API Info */}
-                <div class={cn("p-4")}>
-                    <div class={cn("flex items-center justify-between")}>
-                        <div class={cn("text-2xl font-bold")}>{APIInfo.value?.name}({APIInfo.value?.path})</div>
-                        <ComfirmButton text="运行" onClick={() => {
-                            activeTab.value = 'processingFunction';
-                            handleRun('excuteResult');
-                        }}></ComfirmButton>
-                    </div>
-                    <div class={cn("text-gray-600 dark:text-gray-400 mt-1 text-sm")}>{APIInfo.value?.description}</div>
-                    <div class={cn("flex items-center space-x-2 mt-2")}>
-                        <div class={cn(
-                            getMethodStyles(API_METHOD[APIInfo.value?.method]),
-                            "rounded-[4px]",
-                            "py-1 px-2",
-                            "cursor-pointer select-none inline-block",
-                            "text-gray-600 dark:text-slate-50",
-                            "font-[600]",
-                            "transition-colors duration-300"
-                        )}>{API_METHOD[APIInfo.value?.method]}</div>
-                        <div class={cn(
-                            "text-gray-600 dark:text-slate-50",
-                            "cursor-pointer relative group"
-                        )} onClick={() => copyToClipboard(`/visix/api/${route.query.id}`)}>
-                            <div>/visix/api/{route.query.id}</div>
+            <>
+                {/* 删除弹窗部分 */}
+                <ComfirmDialog ref="deleteDialogRef" title="Danger" message="Are you sure you want to delete this API?"
+                    isOpen={isOpenDeleteAPIDialog.value}
+                    onCancel={() => isOpenDeleteAPIDialog.value = false}
+                    onConfirm={handleDelete}
+                />
+                <div class={cn("text-gray-900 dark:text-gray-100 relative h-screen w-full")}>
+                    {/* API Info */}
+                    <div class={cn("p-4")}>
+                        <div class={cn("flex items-center justify-between")}>
+                            <div class={cn("text-2xl font-bold")}>{APIInfo.value?.name}({APIInfo.value?.path})</div>
+                            <div>
+                                <ComfirmButton text="Run" class="mr-4" onClick={() => {
+                                    activeTab.value = 'processingFunction';
+                                    handleRun('excuteResult');
+                                }}></ComfirmButton>
+                                <ComfirmButton text="Delete" onClick={() => isOpenDeleteAPIDialog.value = true}></ComfirmButton>
+                            </div>
+                        </div>
+                        <div class={cn("text-gray-600 dark:text-gray-400 mt-1 text-sm")}>{APIInfo.value?.description}</div>
+                        <div class={cn("flex items-center space-x-2 mt-2")}>
                             <div class={cn(
-                                "absolute -bottom-1.5 left-0 w-0 h-[2px]",
-                                "animate-pulse",
-                                "group-hover:w-full",
-                                "transition-all duration-300",
-                                "ease-[cubic-bezier(0.4,0,0.2,1)]",
-                                "bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500",
-                                "bg-[length:100%_auto]",
-                                "animate-gradient"
-                            )}></div>
-                        </div>
-                        <div class={cn("flex items-center gap-2 text-gray-600 dark:text-slate-50 text-sm")}>
+                                getMethodStyles(API_METHOD[APIInfo.value?.method]),
+                                "rounded-[4px]",
+                                "py-1 px-2",
+                                "cursor-pointer select-none inline-block",
+                                "text-gray-600 dark:text-slate-50",
+                                "font-[600]",
+                                "transition-colors duration-300"
+                            )}>{API_METHOD[APIInfo.value?.method]}</div>
                             <div class={cn(
-                                "w-2 h-2 rounded-full",
-                                getStepStyles(APIInfo.value.step)
-                            )}></div>
-                            {API_STEP[APIInfo.value.step]}
+                                "text-gray-600 dark:text-slate-50",
+                                "cursor-pointer relative group"
+                            )} onClick={() => copyToClipboard(`/visix/api/${route.query.id}`)}>
+                                <div>/visix/api/{route.query.id}</div>
+                                <div class={cn(
+                                    "absolute -bottom-1.5 left-0 w-0 h-[2px]",
+                                    "animate-pulse",
+                                    "group-hover:w-full",
+                                    "transition-all duration-300",
+                                    "ease-[cubic-bezier(0.4,0,0.2,1)]",
+                                    "bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500",
+                                    "bg-[length:100%_auto]",
+                                    "animate-gradient"
+                                )}></div>
+                            </div>
+                            <div class={cn("flex items-center gap-2 text-gray-600 dark:text-slate-50 text-sm")}>
+                                <div class={cn(
+                                    "w-2 h-2 rounded-full",
+                                    getStepStyles(APIInfo.value.step)
+                                )}></div>
+                                {API_STEP[APIInfo.value.step]}
+                            </div>
                         </div>
+
+                        <div class={cn("flex items-center gap-4 mt-4 text-sm text-gray-600 dark:text-gray-400")}>
+                            <div class={cn("flex items-center gap-2")}>
+                                <span>createdAt:</span>
+                                <span>{new Date(APIInfo.value?.createdAt).toLocaleString()}</span>
+                            </div>
+                            <div class={cn("flex items-center gap-2")}>
+                                <span>updatedAt:</span>
+                                <span>{new Date(APIInfo.value?.updatedAt).toLocaleString()}</span>
+                            </div>
+                        </div>
+
+                        {/* 请求头、参数、数据单元、处理函数切换部分 */}
+                        <div class={cn("mt-8")}>
+                            <Tab options={tabList} active={activeTab} onActive={(id: string) => activeTab.value = id}>
+                                {activeTab.value === 'headers' && (
+                                    <div class={cn("p-4")}>
+                                        <div class={cn("text-lg font-bold")}>
+                                            <APIHeader
+                                                headers={APIRequestHeaderInfo.value}
+                                                onHeaderDataChange={(val: any[], enableHaderRealTimeSync: Ref<boolean>) => {
+                                                    paramsDataChange("headers", val, enableHaderRealTimeSync)
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                                {activeTab.value === 'params' && (
+                                    <div class={cn("p-4")}>
+                                        <div class={cn("text-lg font-bold")}>
+                                            <APIBody
+                                                params={APIRequestBodyInfo.value}
+                                                onParamsChange={(val: any[], enableHaderRealTimeSync: Ref<boolean>) => {
+                                                    paramsDataChange("bodys", val, enableHaderRealTimeSync)
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                                {activeTab.value === 'dataUnit' && (
+                                    <div class={cn("p-4")}>
+                                        <div class={cn("text-lg font-bold")}>
+                                            <DataUnit />
+                                        </div>
+                                    </div>
+                                )}
+                                {activeTab.value === 'processingFunction' && (
+                                    <div class={cn("p-4")}>
+                                        <div class={cn("flex items-center pb-4")}>
+                                            <span class={cn("text-base font-bold mr-2")}>Enable Logging for Processing Function</span>
+                                            <Switch
+                                                modelValue={isOpenProcessingFunctionLog.value}
+                                                onUpdate:modelValue={(value: boolean) => isOpenProcessingFunctionLog.value = value}
+                                            />
+                                        </div>
+                                        {/* 前后置函数部分 */}
+                                        <div class={cn("flex gap-4")}>
+                                            {/* 前置函数 */}
+                                            <ProcessingEditor
+                                                type="preprocessing"
+                                                editorRef={preprocessingEditorRef}
+                                                loading={preprocessingLoading}
+                                                func={preprocessingEditForm.value.logic}
+                                                isShow={isShowPreprocessingEditor.value}
+                                            />
+
+                                            {/* 后置函数 */}
+                                            <ProcessingEditor
+                                                type="postprocessing"
+                                                editorRef={postprocessingEditorRef}
+                                                loading={postprocessingLoading}
+                                                func={postprocessingEditForm.value.logic}
+                                                isShow={isShowPostprocessingEditor.value}
+                                            />
+
+                                            {/* 结果预览 */}
+                                            <ProcessingEditor
+                                                type="excuteResult"
+                                                editorRef={excuteResultEditorRef}
+                                                loading={postprocessingLoading}
+                                                func={excuteResultEditForm.value}
+                                                isShow={isShowExcuteResultEditor.value}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                            </Tab>
+                        </div>
+
+
                     </div>
 
-                    <div class={cn("flex items-center gap-4 mt-4 text-sm text-gray-600 dark:text-gray-400")}>
-                        <div class={cn("flex items-center gap-2")}>
-                            <span>createdAt:</span>
-                            <span>{new Date(APIInfo.value?.createdAt).toLocaleString()}</span>
-                        </div>
-                        <div class={cn("flex items-center gap-2")}>
-                            <span>updatedAt:</span>
-                            <span>{new Date(APIInfo.value?.updatedAt).toLocaleString()}</span>
-                        </div>
+                    {/* Loading */}
+                    <div style={{ left: `${LEFT_SIDEBAR_WIDTH}px` }} class={cn(
+                        "fixed",
+                        "inset-0",
+                        "bg-white dark:bg-gray-900",
+                        "px-4 lg:pr-4 lg:m-2",
+                        "lg:rounded-lg lg:shadow-sm",
+                        "flex items-center justify-center",
+                        "transition-opacity duration-300",
+                        loading.value ? "opacity-100" : "opacity-0 pointer-events-none"
+                    )}>
+                        <div class={cn(
+                            "animate-spin rounded-full",
+                            "h-8 w-8",
+                            "border-b-2 border-blue-500"
+                        )}></div>
                     </div>
-
-                    {/* 请求头、参数、数据单元、处理函数切换部分 */}
-                    <div class={cn("mt-8")}>
-                        <Tab options={tabList} active={activeTab} onActive={(id: string) => activeTab.value = id}>
-                            {activeTab.value === 'headers' && (
-                                <div class={cn("p-4")}>
-                                    <div class={cn("text-lg font-bold")}>
-                                        <APIHeader
-                                            headers={APIRequestHeaderInfo.value}
-                                            onHeaderDataChange={(val: any[], enableHaderRealTimeSync: Ref<boolean>) => {
-                                                paramsDataChange("headers", val, enableHaderRealTimeSync)
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                            )}
-                            {activeTab.value === 'params' && (
-                                <div class={cn("p-4")}>
-                                    <div class={cn("text-lg font-bold")}>
-                                        <APIBody
-                                            params={APIRequestBodyInfo.value}
-                                            onParamsChange={(val: any[], enableHaderRealTimeSync: Ref<boolean>) => {
-                                                paramsDataChange("bodys", val, enableHaderRealTimeSync)
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                            )}
-                            {activeTab.value === 'dataUnit' && (
-                                <div class={cn("p-4")}>
-                                    <div class={cn("text-lg font-bold")}>
-                                        <DataUnit />
-                                    </div>
-                                </div>
-                            )}
-                            {activeTab.value === 'processingFunction' && (
-                                <div class={cn("p-4")}>
-                                    <div class={cn("flex items-center pb-4")}>
-                                        <span class={cn("text-base font-bold mr-2")}>Enable Logging for Processing Function</span>
-                                        <Switch
-                                            modelValue={isOpenProcessingFunctionLog.value}
-                                            onUpdate:modelValue={(value: boolean) => isOpenProcessingFunctionLog.value = value}
-                                        />
-                                    </div>
-                                    {/* 前后置函数部分 */}
-                                    <div class={cn("flex gap-4")}>
-                                        {/* 前置函数 */}
-                                        <ProcessingEditor
-                                            type="preprocessing"
-                                            editorRef={preprocessingEditorRef}
-                                            loading={preprocessingLoading}
-                                            func={preprocessingEditForm.value.logic}
-                                            isShow={isShowPreprocessingEditor.value}
-                                        />
-
-                                        {/* 后置函数 */}
-                                        <ProcessingEditor
-                                            type="postprocessing"
-                                            editorRef={postprocessingEditorRef}
-                                            loading={postprocessingLoading}
-                                            func={postprocessingEditForm.value.logic}
-                                            isShow={isShowPostprocessingEditor.value}
-                                        />
-
-                                        {/* 结果预览 */}
-                                        <ProcessingEditor
-                                            type="excuteResult"
-                                            editorRef={excuteResultEditorRef}
-                                            loading={postprocessingLoading}
-                                            func={excuteResultEditForm.value}
-                                            isShow={isShowExcuteResultEditor.value}
-                                        />
-                                    </div>
-                                </div>
-                            )}
-                        </Tab>
-                    </div>
-
-
-                </div>
-
-                {/* Loading */}
-                <div style={{ left: `${LEFT_SIDEBAR_WIDTH}px` }} class={cn(
-                    "fixed",
-                    "inset-0",
-                    "bg-white dark:bg-gray-900",
-                    "px-4 lg:pr-4 lg:m-2",
-                    "lg:rounded-lg lg:shadow-sm",
-                    "flex items-center justify-center",
-                    "transition-opacity duration-300",
-                    loading.value ? "opacity-100" : "opacity-0 pointer-events-none"
-                )}>
-                    <div class={cn(
-                        "animate-spin rounded-full",
-                        "h-8 w-8",
-                        "border-b-2 border-blue-500"
-                    )}></div>
-                </div>
-            </div >
+                </div >
+            </>
         );
     }
 });
