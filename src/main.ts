@@ -18,6 +18,17 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 }
 
 
+// // 预先加载monaco-editor的js文件（文件过大，跳转页面的时候第一次加载会卡住）
+// const modules = import.meta.glob('/assets/monaco-*.js');
+// Object.keys(modules).forEach((path) => {
+//     const preload = document.createElement('link');
+//     preload.rel = 'preload';
+//     preload.href = path;
+//     preload.as = 'script';
+//     document.head.appendChild(preload);
+// });
+
+
 initTheme();
 
 
