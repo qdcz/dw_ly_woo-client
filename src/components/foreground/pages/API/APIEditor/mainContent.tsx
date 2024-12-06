@@ -54,6 +54,7 @@ export default defineComponent({
             { id: "params", name: "Params" },
             { id: "dataUnit", name: "Data Unit" },
             { id: "processingFunction", name: "Processing Function" },
+            { id: "setting", name: "Setting" },
         ]
         /**
          * component ref
@@ -565,6 +566,13 @@ export default defineComponent({
                                                 func={excuteResultEditForm.value}
                                                 isShow={isShowExcuteResultEditor.value}
                                             />
+                                        </div>
+                                    </div>
+                                )}
+                                {activeTab.value === 'setting' && (
+                                    <div class={cn("p-4")}>
+                                        <div class={cn("text-lg font-bold")}>
+                                            Setting
                                         </div>
                                     </div>
                                 )}
