@@ -27,6 +27,10 @@ export default defineComponent({
             type: Boolean,
             default: true
         },
+        focusBordered: {
+            type: Boolean,
+            default: true
+        },
         prop: {
             type: String,
             default: ''
@@ -86,7 +90,7 @@ export default defineComponent({
                         props.disabled && "opacity-50 cursor-not-allowed",
                         !props.disabled && "cursor-pointer",
                         "transition duration-200 ease-in",
-                        !isOpen.value ? "" : `shadow-ly_inputActive dark:shadow-ly_inputActive__dark`
+                        props.focusBordered && (!isOpen.value ? "" : `shadow-ly_inputActive dark:shadow-ly_inputActive__dark`)
                     )}
                 >
                     <span class={cn(
@@ -114,9 +118,14 @@ export default defineComponent({
                 </button>
 
                 {/* field check error */}
-                <div class={cn("text-red-500 text-xs mt-1 ml-2 transition-all duration-300 ease-linear")}>
-                    {checkError?.value[props.prop]}
-                </div>
+                {
+                    checkError?.value[props.prop] && (
+                        <div class={cn("text-red-500 text-xs mt-1 ml-2 transition-all duration-300 ease-linear")}>
+                            {checkError?.value[props.prop]}
+                        </div>
+                    )
+                }
+
 
                 {/** drop down list */}
                 <Transition

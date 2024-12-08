@@ -1,20 +1,25 @@
-import { defineComponent, onMounted, provide, Ref, ref } from 'vue';
+import { computed, ComputedRef, defineComponent, onMounted, provide, Ref, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import router from '@/router';
+
 import { cn, convertBooleanNumber, convertMonacoValue, deepClone, generateUuid } from '@/utils/index';
 import { LEFT_SIDEBAR_WIDTH, MIN_HEIGHT_PREPROCESSING_EDITOR, API_METHOD, API_STEP } from '@/constants';
-import APIs from '@/components/foreground/pages/API/APIs';
+
 import { ElMessage } from 'element-plus';
 import MonacoEditor from '@/components/monaco.vue';
 import editorFuncBox from '@/components/editor-func-box/index.jsx';
 import Switch from '@/components/foreground/form/Switch';
+import Select from '@/components/foreground/form/Select';
 import Tab from '@/components/foreground/other/tab'
+import ComfirmButton from '@/components/foreground/form/ComfirmButton';
+import ComfirmDialog from '@/components/foreground/dialog/confirm';
+
+import { ApiStore } from '@/store';
+
+import APIs from '@/components/foreground/pages/API/APIs';
 import APIHeader from './APIHeader';
 import APIBody from './APIBody';
 import DataUnit from './DataUnit';
-import { ApiStore } from '@/store';
-import ComfirmButton from '@/components/foreground/form/ComfirmButton';
-import ComfirmDialog from '@/components/foreground/dialog/confirm';
 
 
 
@@ -26,6 +31,11 @@ const defaultPrePostprocessingForm = {
     description: '',
 }
 
+const API_STEP_OPTIONS = Object.keys(API_STEP).map((key) => ({
+    label: API_STEP[key],
+    value: key
+}));
+
 export default defineComponent({
     name: "mainContent",
     components: {
@@ -35,6 +45,7 @@ export default defineComponent({
         APIBody,
         DataUnit,
         Switch,
+        Select,
         Tab,
         ComfirmDialog
     },
@@ -47,6 +58,7 @@ export default defineComponent({
         const postprocessingEditForm = ref(deepClone(defaultPrePostprocessingForm));
         const excuteResultEditForm = ref<string | null>(null);
         const isOpenProcessingFunctionLog = ref(false);
+        const isOpenAuthentication = ref(false);
         const isOpenDeleteAPIDialog = ref(false);
         const apiStore = ApiStore();
         const tabList = [
@@ -101,16 +113,16 @@ export default defineComponent({
             return styles[method] || styles['DELETE'];
         };
 
-
+        const stepColor: ComputedRef<string> = computed(() => getStepStyles(APIInfo.value.step));
         const getStepStyles = (step: number) => {
             const styles = {
-                0: "bg-green-500",
                 1: "bg-blue-500",
-                2: "bg-yellow-500",
-                3: "bg-purple-500",
-                4: "bg-red-500"
+                2: "bg-green-500",
+                3: "bg-yellow-500",
+                4: "bg-purple-500",
+                5: "bg-red-500"
             };
-            return styles[step] || styles[4];
+            return styles[step] || styles[5];
         };
 
         const copyToClipboard = (text: string) => {
@@ -475,12 +487,15 @@ export default defineComponent({
                                     "animate-gradient"
                                 )}></div>
                             </div>
-                            <div class={cn("flex items-center gap-2 text-gray-600 dark:text-slate-50 text-sm")}>
+                            <div class={cn("flex items-center  text-gray-600 dark:text-slate-50 text-sm")}>
                                 <div class={cn(
                                     "w-2 h-2 rounded-full",
-                                    getStepStyles(APIInfo.value.step)
+                                    stepColor.value
                                 )}></div>
-                                {API_STEP[APIInfo.value.step]}
+                                <Select bordered={false} focusBordered={false} options={API_STEP_OPTIONS} modelValue={APIInfo.value.step} onUpdate:modelValue={(val) => {
+                                    APIInfo.value.step = val;
+                                    ElMessage.success(`Step changed to ${API_STEP[val]}`);
+                                }}></Select>
                             </div>
                         </div>
 
@@ -531,13 +546,6 @@ export default defineComponent({
                                 )}
                                 {activeTab.value === 'processingFunction' && (
                                     <div class={cn("p-4")}>
-                                        <div class={cn("flex items-center pb-4")}>
-                                            <span class={cn("text-base font-bold mr-2")}>Enable Logging for Processing Function</span>
-                                            <Switch
-                                                modelValue={isOpenProcessingFunctionLog.value}
-                                                onUpdate:modelValue={(value: boolean) => isOpenProcessingFunctionLog.value = value}
-                                            />
-                                        </div>
                                         {/* 前后置函数部分 */}
                                         <div class={cn("flex gap-4")}>
                                             {/* 前置函数 */}
@@ -572,7 +580,20 @@ export default defineComponent({
                                 {activeTab.value === 'setting' && (
                                     <div class={cn("p-4")}>
                                         <div class={cn("text-lg font-bold")}>
-                                            Setting
+                                            <div class={cn("flex items-center pb-4")}>
+                                                <span class={cn("text-base font-bold mr-2")}>Enable Logging for Processing Function</span>
+                                                <Switch
+                                                    modelValue={isOpenProcessingFunctionLog.value}
+                                                    onUpdate:modelValue={(value: boolean) => isOpenProcessingFunctionLog.value = value}
+                                                />
+                                            </div>
+                                            <div class={cn("flex items-center pb-4")}>
+                                                <span class={cn("text-base font-bold mr-2")}>Enable Authentication</span>
+                                                <Switch
+                                                    modelValue={isOpenAuthentication.value}
+                                                    onUpdate:modelValue={(value: boolean) => isOpenAuthentication.value = value}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 )}

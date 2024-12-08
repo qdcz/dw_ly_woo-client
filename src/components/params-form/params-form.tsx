@@ -113,7 +113,7 @@ export default defineComponent({
                         { key: "Object", label: "Object", value: "Object" },
                         { key: "Boolean", label: "Boolean", value: "Boolean" }
                     ];
-                    return <Select bordered={false} options={options} {...commonProps} onUpdate:modelValue={(val) => {
+                    return <Select class='p-0.5' bordered={false} options={options} {...commonProps} onUpdate:modelValue={(val) => {
                         columnData.value = val;
                         emitParamsDataChange()
                     }} />
