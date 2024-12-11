@@ -123,7 +123,7 @@ import {
 } from "../api";
 import { ElMessage, ElMessageBox } from "element-plus";
 import MonacoEditor from "../components/monaco.vue";
-import { publicKeyStr, extractKeyValuePairs, formatDateTime, encryptAES, decryptAES } from "../utils";
+import { extractKeyValuePairs, formatDateTime, encryptAES, decryptAES } from "../utils";
 export default {
     components: {
         MonacoEditor,

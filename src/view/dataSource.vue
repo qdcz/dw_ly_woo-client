@@ -86,10 +86,7 @@ import {
     TestDataBaseConn,
 } from "../api";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { publicKeyStr, extractKeyValuePairs, formatDateTime } from "../utils/index";
-import JSEncrypt from "jsencrypt";
-const jsEncrypt = new JSEncrypt();
-jsEncrypt.setPublicKey(publicKeyStr);
+import { extractKeyValuePairs, formatDateTime } from "../utils/index";
 
 export default {
     setup() {

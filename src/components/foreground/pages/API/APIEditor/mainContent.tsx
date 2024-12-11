@@ -2,7 +2,7 @@ import { computed, ComputedRef, defineComponent, onMounted, provide, Ref, ref } 
 import { useRoute } from 'vue-router';
 import router from '@/router';
 
-import { cn, convertBooleanNumber, convertMonacoValue, deepClone, generateUuid } from '@/utils/index';
+import { cn, convertBooleanNumber, convertMonacoValue, deepClone, encryptAES, generateUuid } from '@/utils/index';
 import { LEFT_SIDEBAR_WIDTH, MIN_HEIGHT_PREPROCESSING_EDITOR, API_METHOD, API_STEP } from '@/constants';
 
 import { ElMessage } from 'element-plus';
@@ -14,12 +14,15 @@ import Tab from '@/components/foreground/other/tab'
 import ComfirmButton from '@/components/foreground/form/ComfirmButton';
 import ComfirmDialog from '@/components/foreground/dialog/confirm';
 
+import RefreshIcon from '@/components/foreground/icon/Refresh';
+
 import { ApiStore } from '@/store';
 
 import APIs from '@/components/foreground/pages/API/APIs';
 import APIHeader from './APIHeader';
 import APIBody from './APIBody';
 import DataUnit from './DataUnit';
+import Input from '@/components/foreground/form/Input';
 
 
 
@@ -47,7 +50,8 @@ export default defineComponent({
         Switch,
         Select,
         Tab,
-        ComfirmDialog
+        ComfirmDialog,
+        RefreshIcon
     },
     setup(props) {
         const route = useRoute();
@@ -60,6 +64,7 @@ export default defineComponent({
         const isOpenProcessingFunctionLog = ref(false);
         const isOpenAuthentication = ref(false);
         const isOpenDeleteAPIDialog = ref(false);
+        const tempApiKey = ref("");
         const apiStore = ApiStore();
         const tabList = [
             { id: "headers", name: "Headers" },
@@ -420,6 +425,13 @@ export default defineComponent({
             });
         }
 
+        const handleUpdateTempApiKey = () => {
+            const apiId = route.query.id as string;
+            const expireTime = new Date(new Date().getTime() + 1000 * 60 * 60 * 24).getTime().toString();
+            const encryptTimestamp = encryptAES(`${apiId}-${expireTime}`);
+            tempApiKey.value = encryptTimestamp;
+        }
+
         onMounted(() => {
             APIs._APIInfo({ id: route.query.id as string }).then((res: any) => {
                 if (res.code === 200) {
@@ -588,12 +600,40 @@ export default defineComponent({
                                                 />
                                             </div>
                                             <div class={cn("flex items-center pb-4")}>
-                                                <span class={cn("text-base font-bold mr-2")}>Enable Authentication</span>
+                                                <span class={cn("text-base font-bold mr-2")}>Temporary Authentication-Free Call</span>
                                                 <Switch
                                                     modelValue={isOpenAuthentication.value}
                                                     onUpdate:modelValue={(value: boolean) => isOpenAuthentication.value = value}
                                                 />
                                             </div>
+                                            {
+                                                isOpenAuthentication.value && (
+                                                    <div class={cn("p-2")}>
+                                                        <div class={cn("flex items-center")}>
+                                                            <span class={cn("text-base font-bold mr-2 text-nowrap")}>Expiration time</span>
+                                                            <Input
+                                                                class={cn("mr-2")}
+                                                                disabled
+                                                                bordered
+                                                                placeholder="Click the update button to get a temporary API Key"
+                                                                modelValue={tempApiKey.value}
+                                                            />
+                                                            <RefreshIcon height="2.5" width="2.5" onClick={handleUpdateTempApiKey} />
+                                                        </div>
+                                                        <div class={cn("flex items-center")}>
+                                                            <span class={cn("text-base font-bold mr-2 text-nowrap")}>Temporary API Key</span>
+                                                            <Input
+                                                                class={cn("mr-2")}
+                                                                disabled
+                                                                bordered
+                                                                placeholder="Click the update button to get a temporary API Key"
+                                                                modelValue={tempApiKey.value}
+                                                            />
+                                                            <RefreshIcon height="2.5" width="2.5" onClick={handleUpdateTempApiKey} />
+                                                        </div>
+                                                    </div>
+                                                )
+                                            }
                                         </div>
                                     </div>
                                 )}

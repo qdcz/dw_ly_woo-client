@@ -1,7 +1,7 @@
 import { stringToArrayBuffer } from "./string";
 import * as CryptoJS from "crypto-js";
 
-// sql语句加密，对称后端的私钥
+// 非对称公钥
 export const publicKeyStr = `-----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDJlvQVHJKyjAWqEkckekR4EYMv
 pN2OgpTq6kIjJ/ZY23aU1E5i7uPodkAWc33yFLidndJxr7nXTU5ZQ64qB0d4ZOro
@@ -9,6 +9,7 @@ pN2OgpTq6kIjJ/ZY23aU1E5i7uPodkAWc33yFLidndJxr7nXTU5ZQ64qB0d4ZOro
 TujWz6eGHi77+YEwJwIDAQAB
 -----END PUBLIC KEY-----`;
 
+// 对称私钥（用于：sql语句解密，临时apikey解密）
 export const AESKey = `CZMa6O9v0oOtUoLa+VOeaakcUQKPfgz/zK0r9W58jQI=`;
 
 /**
