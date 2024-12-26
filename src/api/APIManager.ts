@@ -70,6 +70,11 @@ export const UpdateAPIModuleHook = (id: string, data: any) => {
     return request.patch("/hook/" + id, { ...data });
 };
 
+// 更-修改接口状态
+export const UpdateAPIModuleStep = (data: any) => {
+    return request.patch("/apiModule/apiStep", { ...data });
+};
+
 // 接口调用预览结果
 export const APIExecutePreview = (
     eName: string,

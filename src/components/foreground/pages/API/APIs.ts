@@ -18,7 +18,8 @@ import {
     MockDataUnitList,
     BoundDataUnit,
     SQLResult,
-    DeleteAPIModule
+    DeleteAPIModule,
+    UpdateAPIModuleStep
 } from '@/api';
 
 
@@ -223,6 +224,13 @@ const _SqlResult = (params) => {
     return SQLResult(params)
 };
 
+
+// 更新接口状态
+const _UpdateAPIModuleStep = (data: any) => {
+    return UpdateAPIModuleStep(data)
+};
+
+
 export default {
     _APIModuleList,
     _APIInfo,
@@ -242,5 +250,6 @@ export default {
     _APIModuleDataUnitEnabled,
     _GetDataUnitList,
     _BoundDataUnit,
-    _SqlResult
+    _SqlResult,
+    _UpdateAPIModuleStep
 }

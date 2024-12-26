@@ -428,7 +428,7 @@ export default defineComponent({
         const handleUpdateTempApiKey = () => {
             const apiId = route.query.id as string;
             const expireTime = new Date(new Date().getTime() + 1000 * 60 * 60 * 24).getTime().toString();
-            const encryptTimestamp = encryptAES(`${apiId}-${expireTime}`);
+            const encryptTimestamp = encryptAES(`${apiId}WOO${expireTime}`);
             tempApiKey.value = encryptTimestamp;
         }
 
@@ -506,7 +506,11 @@ export default defineComponent({
                                 )}></div>
                                 <Select bordered={false} focusBordered={false} options={API_STEP_OPTIONS} modelValue={APIInfo.value.step} onUpdate:modelValue={(val) => {
                                     APIInfo.value.step = val;
-                                    ElMessage.success(`Step changed to ${API_STEP[val]}`);
+                                    APIs._UpdateAPIModuleStep({ id: route.query.id as string, step: val * 1 }).then((res: any) => {
+                                        if (res.code === 200) {
+                                            ElMessage.success(`Step changed to ${API_STEP[val]}`);
+                                        }
+                                    });
                                 }}></Select>
                             </div>
                         </div>
