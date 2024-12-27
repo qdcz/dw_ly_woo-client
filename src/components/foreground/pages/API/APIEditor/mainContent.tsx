@@ -628,11 +628,14 @@ export default defineComponent({
                                                         </div>
                                                         <div class={cn("flex items-center")}>
                                                             <span class={cn("text-base font-bold mr-2 text-nowrap")}>Expiration time</span>
-                                                            <Select class={cn("w-40")} placeholder="select expiration time"
-                                                                options={tempApiKeyExpirationTimeOptions} modelValue={tempApiKeyExpirationTime.value}
-                                                                onUpdate:modelValue={(val) => {
-                                                                    tempApiKeyExpirationTime.value = val
-                                                                }}></Select>
+                                                            <div class={cn("w-40")}>
+                                                                <Select placeholder="select expiration time"
+                                                                    options={tempApiKeyExpirationTimeOptions} modelValue={tempApiKeyExpirationTime.value}
+                                                                    onUpdate:modelValue={(val) => {
+                                                                        tempApiKeyExpirationTime.value = val;
+                                                                        handleUpdateTempApiKey();
+                                                                    }}></Select>
+                                                            </div>
                                                         </div>
                                                         <div class={cn("flex items-center")}>
                                                             <span class={cn("text-base font-bold mr-2 text-nowrap")}>Temporary API Key</span>
