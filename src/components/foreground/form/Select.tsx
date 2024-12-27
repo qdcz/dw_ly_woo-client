@@ -142,7 +142,8 @@ export default defineComponent({
                             "bg-white dark:bg-gray-600",
                             "border border-gray-200 dark:border-gray-500",
                             "text-sm",
-                            "w-full"
+                            "w-full",
+                            "max-h-64 overflow-auto no-scrollbar",
                         )}>
                             {props.options.map((option) => (
                                 <div

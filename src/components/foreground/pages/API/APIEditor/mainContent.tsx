@@ -39,6 +39,13 @@ const API_STEP_OPTIONS = Object.keys(API_STEP).map((key) => ({
     value: key
 }));
 
+const tempApiKeyExpirationTimeOptions = new Array(60).fill(0).map((i, index) => {
+    return {
+        label: `${index + 1}分钟`,
+        value: (index + 1) * 1000 * 60
+    }
+})
+
 export default defineComponent({
     name: "mainContent",
     components: {
@@ -65,6 +72,7 @@ export default defineComponent({
         const isOpenAuthentication = ref(false);
         const isOpenDeleteAPIDialog = ref(false);
         const tempApiKey = ref("");
+        const tempApiKeyExpirationTime = ref<number | null>(1000 * 60);
         const apiStore = ApiStore();
         const tabList = [
             { id: "headers", name: "Headers" },
@@ -215,14 +223,7 @@ export default defineComponent({
             if (type !== 'excuteResult') return;
             try {
                 loading.value = true;
-                if (!projectInfo.value) {
-                    const response: any = await APIs._GetProjectInfo(APIInfo.value.projectId);
-                    if (response.code === 200) {
-                        projectInfo.value = response.data;
-                    }
-                }
-                const eName = projectInfo.value.eName;
-
+                const eName = projectInfo.value?.eName;
                 const params = {};
                 const headers = {};
                 if (isOpenProcessingFunctionLog.value) {
@@ -401,6 +402,13 @@ export default defineComponent({
             APIRequestBodyId.value = APIModuleBindRequestResult.id
         }
 
+        const getProjectInfo = async () => {
+            const response: any = await APIs._GetProjectInfo(APIInfo.value.projectId);
+            if (response.code === 200) {
+                projectInfo.value = response.data;
+            }
+        }
+
         // 获取前后处理函数
         const getProcessingFunction = async (type: 'preprocessing' | 'postprocessing') => {
             const hookType = type === 'preprocessing' ? 1 : 2;
@@ -427,7 +435,7 @@ export default defineComponent({
 
         const handleUpdateTempApiKey = () => {
             const apiId = route.query.id as string;
-            const expireTime = new Date(new Date().getTime() + 1000 * 60 * 60 * 24).getTime().toString();
+            const expireTime = new Date(new Date().getTime() + Number(tempApiKeyExpirationTime.value)).getTime().toString();
             const encryptTimestamp = encryptAES(`${apiId}WOO${expireTime}`);
             tempApiKey.value = encryptTimestamp;
         }
@@ -438,15 +446,16 @@ export default defineComponent({
                     APIInfo.value = res.data;
                 }
             }).finally(() => {
+                getProjectInfo();
+                getAPIRequest();
                 setTimeout(() => {
                     loading.value = false;
                 }, 300);
             });
-
             getProcessingFunction('preprocessing');
             getProcessingFunction('postprocessing');
 
-            getAPIRequest();
+
 
             activeTab.value = 'headers';
         });
@@ -486,8 +495,8 @@ export default defineComponent({
                             <div class={cn(
                                 "text-gray-600 dark:text-slate-50",
                                 "cursor-pointer relative group"
-                            )} onClick={() => copyToClipboard(`/visix/api/${route.query.id}`)}>
-                                <div>/visix/api/{route.query.id}</div>
+                            )} onClick={() => copyToClipboard(`/visix/api/${projectInfo.value?.eName}/${route.query.id}`)}>
+                                <div>/visix/api/{projectInfo.value?.eName}/{route.query.id}</div>
                                 <div class={cn(
                                     "absolute -bottom-1.5 left-0 w-0 h-[2px]",
                                     "animate-pulse",
@@ -594,7 +603,7 @@ export default defineComponent({
                                     </div>
                                 )}
                                 {activeTab.value === 'setting' && (
-                                    <div class={cn("p-4")}>
+                                    <div class={cn("p-4 select-none")}>
                                         <div class={cn("text-lg font-bold")}>
                                             <div class={cn("flex items-center pb-4")}>
                                                 <span class={cn("text-base font-bold mr-2")}>Enable Logging for Processing Function</span>
@@ -613,16 +622,17 @@ export default defineComponent({
                                             {
                                                 isOpenAuthentication.value && (
                                                     <div class={cn("p-2")}>
+                                                        <div class={cn("flex items-center pb-4")}>
+                                                            <span class={cn("text-base font-bold mr-4 text-nowrap")}>How to use?</span>
+                                                            <span class={cn("text-sm text-gray-500 text-nowrap")}>visix/api/xxx/xxx?apiId=Temporary API Key</span>
+                                                        </div>
                                                         <div class={cn("flex items-center")}>
                                                             <span class={cn("text-base font-bold mr-2 text-nowrap")}>Expiration time</span>
-                                                            <Input
-                                                                class={cn("mr-2")}
-                                                                disabled
-                                                                bordered
-                                                                placeholder="Click the update button to get a temporary API Key"
-                                                                modelValue={tempApiKey.value}
-                                                            />
-                                                            <RefreshIcon height="2.5" width="2.5" onClick={handleUpdateTempApiKey} />
+                                                            <Select class={cn("w-40")} placeholder="select expiration time"
+                                                                options={tempApiKeyExpirationTimeOptions} modelValue={tempApiKeyExpirationTime.value}
+                                                                onUpdate:modelValue={(val) => {
+                                                                    tempApiKeyExpirationTime.value = val
+                                                                }}></Select>
                                                         </div>
                                                         <div class={cn("flex items-center")}>
                                                             <span class={cn("text-base font-bold mr-2 text-nowrap")}>Temporary API Key</span>
@@ -635,6 +645,7 @@ export default defineComponent({
                                                             />
                                                             <RefreshIcon height="2.5" width="2.5" onClick={handleUpdateTempApiKey} />
                                                         </div>
+
                                                     </div>
                                                 )
                                             }
