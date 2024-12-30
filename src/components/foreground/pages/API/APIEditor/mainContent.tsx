@@ -25,7 +25,6 @@ import DataUnit from './DataUnit';
 import Input from '@/components/foreground/form/Input';
 
 
-
 const defaultPrePostprocessingForm = {
     id: '',
     name: '',
@@ -44,7 +43,13 @@ const tempApiKeyExpirationTimeOptions = new Array(60).fill(0).map((i, index) => 
         label: `${index + 1}分钟`,
         value: (index + 1) * 1000 * 60
     }
+});
+tempApiKeyExpirationTimeOptions.push({
+    label: `100年`,
+    value: 1000 * 60 * 60 * 24 * 31 * 12 * 100
 })
+
+
 
 export default defineComponent({
     name: "mainContent",

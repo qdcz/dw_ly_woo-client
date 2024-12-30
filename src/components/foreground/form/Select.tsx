@@ -46,7 +46,7 @@ export default defineComponent({
         const selectRef = ref<HTMLDivElement | null>(null);
 
         const selectedLabel = computed(() => {
-            const selected = props.options.find(opt => opt.value == props.modelValue);
+            const selected = props.options.find(opt => opt.value === props.modelValue);
             return selected ? selected.label : props.placeholder;
         });
 
@@ -95,7 +95,7 @@ export default defineComponent({
                 >
                     <span class={cn(
                         "block truncate",
-                        !props.modelValue && "text-gray-400 dark:text-gray-500"
+                        (props.modelValue || props.modelValue === 0) ? "" : "text-gray-400 dark:text-gray-500"
                     )}>
                         {selectedLabel.value}
                     </span>
@@ -155,7 +155,7 @@ export default defineComponent({
                                         "hover:bg-blue-50 hover:text-blue-600",
                                         "dark:hover:bg-gray-900 dark:hover:text-gray-750 dark:hover:font-semibold"
                                     )}
-                                    onClick={() => selectOption(option.value)}
+                                    onClick={selectOption.bind(null, option.value)}
                                 >
                                     {option.label}
                                 </div>

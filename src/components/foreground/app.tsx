@@ -1,6 +1,6 @@
 import { defineComponent, ref, computed, onMounted, onUnmounted } from "vue";
 
-import { UserStore, LayoutStore } from "../../store";
+import { UserStore, LayoutStore, OthereStore } from "../../store";
 
 import UserMenu from "./dialog/userMenu.tsx";
 
@@ -12,6 +12,8 @@ import FoldIcon from "./icon/Fold.tsx";
 import CloseIcon from "./icon/Close.tsx";
 import { LEFT_SIDEBAR_WIDTH } from "@/constants";
 import { cn, throttle } from "@/utils/index";
+import * as APIs from '../../api/index.ts';
+
 
 export default defineComponent({
     components: {
@@ -26,6 +28,14 @@ export default defineComponent({
     setup() {
         const userStore = UserStore();
         const layoutStore = LayoutStore();
+        const othereStore = OthereStore();
+
+        const avatar = computed(() => {
+            if (userStore.userInfo) {
+                return convertMinioImage(JSON.parse(userStore.userInfo).avatar)
+            }
+            return null
+        })
         const nickName = computed(() => {
             if (userStore.userInfo) {
                 return JSON.parse(userStore.userInfo).name;
@@ -40,8 +50,8 @@ export default defineComponent({
             return "暂无数据";
         });
 
-        const isSidebarOpen = ref(false);
-        const isUserMenuOpen = ref(false);
+        const sidebarIsOpen = ref(false);
+        const userMenuIsOpen = ref(false);
 
         const menuList = ref([
             {
@@ -117,17 +127,34 @@ export default defineComponent({
         ]);
 
         const toggleSidebar = () => {
-            isSidebarOpen.value = !isSidebarOpen.value;
+            sidebarIsOpen.value = !sidebarIsOpen.value;
         };
 
         const toggleUserMenu = () => {
-            isUserMenuOpen.value = !isUserMenuOpen.value;
+            userMenuIsOpen.value = !userMenuIsOpen.value;
         };
+
+        const convertMinioImage = (url: string) => {
+            const imageCache = othereStore.getImageCache();
+            if (imageCache.get(url)) {
+                return imageCache.get(url)
+            } else {
+                APIs.downloadImage({
+                    bucketName: "visix",
+                    objectName: encodeURIComponent(url),
+                }).then((res) => {
+                    const minioBase = import.meta.env.VITE_MINIO_ENDPOINT + ":" + import.meta.env.VITE_MINIO_PORT;
+                    res.data = res.data.replace(/http:\/\/[^\/]+:\d+/g, `http://${minioBase}`);
+                    imageCache.set(url, res.data, 1000 * 60 * 20);
+                    return imageCache.get(url)
+                })
+            }
+        }
 
 
         // 添加窗口大小变化监听
         const handleResize = throttle(() => {
-            isSidebarOpen.value = false;
+            sidebarIsOpen.value = false;
         }, 300);
 
         onMounted(() => {
@@ -152,15 +179,14 @@ export default defineComponent({
                             </button>
 
                             <UserMenu
-                                isOpen={isUserMenuOpen.value}
-                                onClose={() => (isUserMenuOpen.value = false)}
+                                isOpen={userMenuIsOpen.value}
+                                onClose={() => userMenuIsOpen.value = false}
                             />
-
                             {/* Sidebar */}
                             <div
                                 class={cn(
                                     "fixed md:static inset-y-0 left-0 transform",
-                                    isSidebarOpen.value ? "translate-x-0" : "-translate-x-full",
+                                    sidebarIsOpen.value ? "translate-x-0" : "-translate-x-full",
                                     "md:translate-x-0 transition duration-200 ease-in-out z-40"
                                 )}
                             >
@@ -209,7 +235,11 @@ export default defineComponent({
                                     >
                                         <div class={cn("flex items-center justify-between cursor-pointer transition p-1 hover:bg-zinc-950/5 dark:hover:bg-gray-700 rounded-lg")}>
                                             <div class={cn("flex")}>
-                                                <div class={cn("w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-600")}></div>
+                                                {
+                                                    avatar.value ? <img class={cn("w-12 h-12 p-1 bg-gray-200 dark:bg-gray-600 rounded-full")} src={avatar.value}></img> :
+                                                        <div class={cn("w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-600")}></div>
+                                                }
+
                                                 <div class={cn("ml-3")}>
                                                     <div class={cn("font-medium dark:text-white")}>
                                                         {nickName.value}

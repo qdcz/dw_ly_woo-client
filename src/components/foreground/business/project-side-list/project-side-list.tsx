@@ -62,7 +62,7 @@ export default defineComponent({
         })
 
         return () => (
-            <div class={cn("flex flex-col overflow-scroll no-scrollbar")} style={{
+            <div class={cn("flex flex-col overflow-scroll no-scrollbar py-2")} style={{
                 maxHeight: clientHeight.value - 180 + "px"
             }}>
                 {
@@ -73,7 +73,7 @@ export default defineComponent({
                                     "flex flex-row justify-between text-gray-600 dark:text-gray-400 mt-1 text-sm cursor-pointer select-none",
                                     "transition-all duration-150 ease-linear",
                                     "hover:text-blue-400 hover:dark:text-blue-600",
-                                    currentSelect.value === item?.id ? "bg-gray-800 rounded-md" : "",
+                                    currentSelect.value === item?.id ? "dark:bg-gray-800 bg-gray-100 shadow-inner rounded-md" : "",
                                     currentSelect.value === item?.id ? "text-blue-400 dark:text-blue-600" : "",
                                     "px-2 py-1"
                                 )}>

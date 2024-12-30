@@ -8,21 +8,23 @@ import UserIcon from "../icon/User.tsx";
 import LogoutIcon from "../icon/Logout.tsx";
 import LightIcon from "../icon/Light.tsx";
 import DarkIcon from "../icon/Dark.tsx";
+import UserInfo from './userInfo.tsx';
 
 export default defineComponent({
     name: "UserMenu",
     props: {
         isOpen: {
-            type: Boolean,
+            type: [Boolean],
             required: true,
         },
         onClose: {
-            type: Function,
+            type: [Function],
             required: true,
         },
     },
     components: {
         Confirm,
+        UserInfo,
         LogoutIcon,
         UserIcon,
         LightIcon,
@@ -30,10 +32,20 @@ export default defineComponent({
     },
     setup(props) {
         const isConfirmOpen = ref(false);
+        const userInfoIsOpen = ref(false)
 
         const onLogoutClick = () => {
-            isConfirmOpen.value = true;
             props.onClose();
+            setTimeout(() => {
+                isConfirmOpen.value = true;
+            }, 100);
+        }
+
+        const onUserInfoClick = () => {
+            props.onClose();
+            setTimeout(() => {
+                userInfoIsOpen.value = true;
+            }, 100);
         }
 
         const onConfirmLogout = () => {
@@ -46,7 +58,7 @@ export default defineComponent({
             {
                 icon: UserIcon,
                 text: "User Info",
-                onClick: () => { }
+                onClick: onUserInfoClick
             },
             {
                 icon: LightIcon,
@@ -67,6 +79,10 @@ export default defineComponent({
         return () => (
             <>
                 <Confirm title="Logout" message="Are you sure you want to logout?" isOpen={isConfirmOpen.value} onCancel={() => isConfirmOpen.value = false} onConfirm={onConfirmLogout} />
+                <UserInfo
+                    isOpen={userInfoIsOpen.value}
+                    onClose={() => (userInfoIsOpen.value = false)}>
+                </UserInfo>
                 {/* 用户菜单遮罩层 */}
                 {props.isOpen && (
                     <div
