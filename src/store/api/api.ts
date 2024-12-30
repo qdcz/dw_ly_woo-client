@@ -4,7 +4,8 @@ export const ApiStore = defineStore({
     id: "api",
     state: () => ({
         preprocessingLog: [],
-        postprocessingLog: []
+        postprocessingLog: [],
+        currentSelectProjectId: ""
     }),
     actions: {
         GETLOGGERDATA() {
@@ -27,6 +28,12 @@ export const ApiStore = defineStore({
                 this.preprocessingLog = [];
                 this.postprocessingLog = [];
             }
+        },
+        changeCurrentSelectProjectId(id: string) {
+            this.currentSelectProjectId = id
+        },
+        getCurrentSelectProjectId(){
+            return this.currentSelectProjectId
         }
     },
 });

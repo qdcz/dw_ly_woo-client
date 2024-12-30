@@ -171,7 +171,7 @@ export default defineComponent({
                                             W
                                         </div>
                                         <span class={cn("ml-2 text-xl font-semibold dark:text-white")}>
-                                            Woo
+                                            {/* Woo */}
                                         </span>
                                         {/* 侧边栏按钮 */}
                                         <button

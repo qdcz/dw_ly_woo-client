@@ -40,5 +40,15 @@ export const downloadImage = (params: any) => {
     return request.post(`/minio/downloadUrl/${params.bucketName}/${params.objectName}`);
 };
 
+// 获取项目的绑定接口列表
+export const GetProjectBindApiList = (params: any) => {
+    return request.get("/project/apiList", { params });
+};
+
+// 获取项目的绑定接口列表
+export const GetProjectBindApiCount = () => {
+    return request.get("/project/apiCountAll", {});
+};
+
 
 

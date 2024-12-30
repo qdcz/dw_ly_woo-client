@@ -1,4 +1,4 @@
-import { defineComponent, onMounted, reactive, ref } from 'vue';
+import { defineComponent, inject, onMounted, reactive, ref } from 'vue';
 import PublicDialog from '@/components/foreground/dialog/publicDialog.tsx';
 import { cn } from '@/utils';
 
@@ -9,6 +9,7 @@ import ComfirmButton from '@/components/foreground/form/ComfirmButton.tsx';
 import APIs from './APIs';
 import { API_METHOD, API_STEP } from '@/constants';
 import { ElMessage } from 'element-plus';
+
 
 export default defineComponent({
     props: {
@@ -31,6 +32,7 @@ export default defineComponent({
     },
     emits: ['refresh'],
     setup(props, { emit }) {
+        const APIPageInject = inject('APIPage') as any;
 
         const projectList: any = ref([]);
         const apiMethodList: any = ref([]);
@@ -109,8 +111,9 @@ export default defineComponent({
                     // clear form data
                     resetFormData();
                     // emit refresh event
-                    emit('refresh');
+                    emit('refresh', APIPageInject.getCurrentSelectProjectId());
                     props.onClose();
+                    APIPageInject.freshProjectList();
                 }
             }).catch((err: any) => {
                 ElMessage.error("validate error: " + Object.values(err)[0] as string);
