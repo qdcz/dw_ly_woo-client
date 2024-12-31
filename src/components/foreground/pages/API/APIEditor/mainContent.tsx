@@ -35,7 +35,7 @@ const defaultPrePostprocessingForm = {
 
 const API_STEP_OPTIONS = Object.keys(API_STEP).map((key) => ({
     label: API_STEP[key],
-    value: key
+    value: Number(key)
 }));
 
 const tempApiKeyExpirationTimeOptions = new Array(60).fill(0).map((i, index) => {

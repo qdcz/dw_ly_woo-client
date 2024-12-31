@@ -143,8 +143,16 @@ export default defineComponent({
                     bucketName: "visix",
                     objectName: encodeURIComponent(url),
                 }).then((res) => {
-                    const minioBase = import.meta.env.VITE_MINIO_ENDPOINT + ":" + import.meta.env.VITE_MINIO_PORT;
-                    res.data = res.data.replace(/http:\/\/[^\/]+:\d+/g, `http://${minioBase}`);
+                    // const minioBase = import.meta.env.VITE_MINIO_ENDPOINT + ":" + import.meta.env.VITE_MINIO_PORT;
+                    // res.data = res.data.replace(/http:\/\/[^\/]+:\d+/g, `http://${minioBase}`);
+
+                    const regex = /^http:\/\/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d+)\/(.*)/;
+                    const match = res.data.match(regex);
+                    if (match) {
+                        // 后面路径部分
+                        res.data = `https://${import.meta.env.VITE_MINIO_DOMAIN}/${match[3]}`
+                    }
+
                     imageCache.set(url, res.data, 1000 * 60 * 20);
                     return imageCache.get(url)
                 })
