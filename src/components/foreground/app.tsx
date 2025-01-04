@@ -143,9 +143,6 @@ export default defineComponent({
                     bucketName: "visix",
                     objectName: encodeURIComponent(url),
                 }).then((res) => {
-                    // const minioBase = import.meta.env.VITE_MINIO_ENDPOINT + ":" + import.meta.env.VITE_MINIO_PORT;
-                    // res.data = res.data.replace(/http:\/\/[^\/]+:\d+/g, `http://${minioBase}`);
-
                     const regex = /^http:\/\/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d+)\/(.*)/;
                     const match = res.data.match(regex);
                     if (match) {
@@ -204,8 +201,8 @@ export default defineComponent({
                                         <div class={cn("w-8 h-8 bg-black dark:bg-white rounded-full flex items-center justify-center text-white dark:text-black")}>
                                             W
                                         </div>
-                                        <span class={cn("ml-2 text-xl font-semibold dark:text-white")}>
-                                            {/* Woo */}
+                                        <span class={cn("ml-4 text-xl font-semibold dark:text-white")}>
+                                            WooServer
                                         </span>
                                         {/* 侧边栏按钮 */}
                                         <button

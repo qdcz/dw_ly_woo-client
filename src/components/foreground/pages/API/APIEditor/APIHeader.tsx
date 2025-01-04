@@ -25,6 +25,9 @@ export default defineComponent({
             { name: "描述", width: "50" }
         ];
 
+        const isShowToopTip_L = ref<Boolean>(false);
+        const isShowToopTip_R = ref<Boolean>(false);
+
         const createHeaderBodyTemplate = () => {
             const id = generateUuid();
             return [
@@ -83,20 +86,62 @@ export default defineComponent({
 
         return () => (
             <div class={cn("w-full")}>
-                <div class={cn("flex items-center justify-start py-2")}>
+                <div class={cn("flex items-center justify-start pb-2")}>
                     <span class={cn(
+                        'cursor-pointer',
+                        "relative",
                         "text-sm mr-2",
                         "transition-all duration-500",
                         enableHaderRealTimeSync.value ? "text-gray-300 dark:text-gray-600" : "text-blue-500 dark:text-indigo-50"
-                    )}>调试模式（修改不会保存至云端）</span>
+                    )}
+                        onMouseenter={() => isShowToopTip_L.value = true}
+                        onMouseleave={() => isShowToopTip_L.value = false}
+                    >
+                        Debug Mode
+                        <div class={cn(
+                            'absolute -left-1/2',
+                            "transition-opacity duration-500",
+                            "mt-4 py-1 px-2 text-sm rounded dark:bg-gray-700 bg-gray-900 dark:text-gray-300 text-white",
+                            'text-nowrap',
+                            isShowToopTip_L.value ? "opacity-1" : "opacity-0"
+                        )}>
+                            <div class={cn(
+                                "absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0",
+                                "border-l-8 border-r-8 border-b-8 border-transparent dark:border-y-gray-700 border-y-gray-300"
+                            )}></div>
+                            <span>Changes will not be saved</span>
+                        </div>
+                    </span>
+
                     <Switch modelValue={enableHaderRealTimeSync.value} onUpdate:modelValue={
                         (value) => { enableHaderRealTimeSync.value = value; }
                     } />
+
                     <span class={cn(
+                        'cursor-pointer',
+                        "relative",
                         "text-sm ml-2",
                         "transition-all duration-500",
                         !enableHaderRealTimeSync.value ? "text-gray-300 dark:text-gray-600" : "text-blue-500 dark:text-indigo-50"
-                    )}>保存模式（单行增删会实时保存至云端，单列需要回车进行保存）</span>
+                    )}
+                        onMouseenter={() => isShowToopTip_R.value = true}
+                        onMouseleave={() => isShowToopTip_R.value = false}
+                    >
+                        Real-time Mode
+                        <div class={cn(
+                            'absolute',
+                            "transition-opacity duration-500",
+                            "mt-4 py-1 px-2 text-sm rounded dark:bg-gray-700 bg-gray-900 dark:text-gray-300 text-white",
+                            'text-nowrap',
+                            isShowToopTip_R.value ? "opacity-1" : "opacity-0"
+                        )}>
+                            <div class={cn(
+                                "absolute bottom-full left-10 transform -translate-x-1/2 w-0 h-0",
+                                "border-l-8 border-r-8 border-b-8 border-transparent dark:border-y-gray-700 border-y-gray-300"
+                            )}></div>
+                            <span>Single line add and delete will be saved in real time, single column needs to be saved by pressing Enter</span>
+                        </div>
+                    </span>
                 </div>
                 <ParamsForm
                     title="请求头"

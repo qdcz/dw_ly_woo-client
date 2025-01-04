@@ -14,8 +14,17 @@ export default defineComponent({
             required: true,
         },
         title: {
+            type: [String, Boolean],
+            required: true,
+            default: ""
+        },
+        notPadding: {
+            type: Boolean,
+            default: false
+        },
+        height: {
             type: String,
-            required: true
+            default: 'auto'
         },
         width: {
             type: String,
@@ -88,49 +97,57 @@ export default defineComponent({
                             "left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
                         )}>
                             <div
-                                style={{ width: props.width }}
+                                style={{ width: props.width, height: props.height }}
                                 class={cn("bg-white dark:bg-gray-800 rounded-lg shadow-xl animate-wiggle")}
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 {/* Dialog Header */}
-                                <div class={cn("flex justify-between items-center px-6 py-4 border-b dark:border-gray-700")}>
-                                    <h3 class={cn("text-lg font-medium text-gray-900 dark:text-gray-100")}>
-                                        {props.title}
-                                    </h3>
-                                    {props.dropdownProps && (
-                                        <Select
-                                            modelValue={props.dropdownProps.modelValue}
-                                            options={props.dropdownProps.options}
-                                            placeholder={props.dropdownProps.placeholder}
-                                            disabled={props.dropdownProps.disabled}
-                                            bordered={props.dropdownProps.bordered}
-                                            onUpdate:modelValue={(v) => emit('selectChange', v)}
-                                        />
-                                    )}
-                                    {props.showClose && (
-                                        <button
-                                            onClick={() => props.onClose()}
-                                            class={cn(
-                                                "text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400",
-                                                "hover:rotate-90 transition-all duration-300 focus:outline-none"
+                                {
+                                    props.title !== false && (
+                                        <div class={cn("flex justify-between items-center px-6 py-4 border-b dark:border-gray-700")}>
+                                            <h3 class={cn("text-lg font-medium text-gray-900 dark:text-gray-100")}>
+                                                {props.title}
+                                            </h3>
+                                            {props.dropdownProps && (
+                                                <Select
+                                                    modelValue={props.dropdownProps.modelValue}
+                                                    options={props.dropdownProps.options}
+                                                    placeholder={props.dropdownProps.placeholder}
+                                                    disabled={props.dropdownProps.disabled}
+                                                    bordered={props.dropdownProps.bordered}
+                                                    onUpdate:modelValue={(v) => emit('selectChange', v)}
+                                                />
                                             )}
-                                        >
-                                            <svg class={cn("h-6 w-6")} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                    )}
-                                </div>
+                                            {props.showClose && (
+                                                <button
+                                                    onClick={() => props.onClose()}
+                                                    class={cn(
+                                                        "text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400",
+                                                        "hover:rotate-90 transition-all duration-300 focus:outline-none"
+                                                    )}
+                                                >
+                                                    <svg class={cn("h-6 w-6")} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            )}
+                                        </div>
+                                    )
+                                }
 
                                 {/* Dialog Content */}
-                                <div class={cn("px-6 py-4 text-gray-900 dark:text-gray-100")}>
+                                <div class={cn(
+                                    !props.notPadding && "px-6 py-4",
+                                    "text-gray-900 dark:text-gray-100"
+                                )}>
                                     {slots.default?.()}
                                 </div>
 
                                 {/* Dialog Footer */}
                                 {slots.footer && (
                                     <div class={cn(
-                                        "px-6 py-2 border-t dark:border-gray-700 flex justify-end space-x-3",
+                                        !props.notPadding && "px-6 py-2",
+                                        "border-t dark:border-gray-700 flex justify-end space-x-3"
                                     )}>
                                         {slots.footer()}
                                     </div>

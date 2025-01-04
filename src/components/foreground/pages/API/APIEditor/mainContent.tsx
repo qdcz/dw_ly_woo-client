@@ -13,6 +13,7 @@ import Select from '@/components/foreground/form/Select';
 import Tab from '@/components/foreground/other/tab'
 import ComfirmButton from '@/components/foreground/form/ComfirmButton';
 import ComfirmDialog from '@/components/foreground/dialog/confirm';
+import codePopupFullScreen from '@/components/foreground/dialog/codePopupFullScreen';
 
 import RefreshIcon from '@/components/foreground/icon/Refresh';
 
@@ -63,19 +64,23 @@ export default defineComponent({
         Select,
         Tab,
         ComfirmDialog,
+        codePopupFullScreen,
         RefreshIcon
     },
     setup(props) {
         const route = useRoute();
-        const loading = ref(true);
-        const preprocessingLoading = ref(true);
-        const postprocessingLoading = ref(true);
+        const loading = ref<boolean>(true);
+        const preprocessingLoading = ref<boolean>(true);
+        const postprocessingLoading = ref<boolean>(true);
         const preprocessingEditForm = ref(deepClone(defaultPrePostprocessingForm));
         const postprocessingEditForm = ref(deepClone(defaultPrePostprocessingForm));
         const excuteResultEditForm = ref<string | null>(null);
-        const isOpenProcessingFunctionLog = ref(false);
-        const isOpenAuthentication = ref(false);
-        const isOpenDeleteAPIDialog = ref(false);
+        const isOpenProcessingFunctionLog = ref<boolean>(false);
+        const isOpenAuthentication = ref<boolean>(false);
+        const isOpenDeleteAPIDialog = ref<boolean>(false);
+        const isShowCodePopupFullScreen = ref<boolean>(false);
+        const codePopupMonacoCode = ref<string | null>(null);
+        const codePopupMonacoType = ref<string>('');
         const tempApiKey = ref("");
         const tempApiKeyExpirationTime = ref<number | null>(1000 * 60);
         const apiStore = ApiStore();
@@ -86,6 +91,11 @@ export default defineComponent({
             { id: "processingFunction", name: "Processing Function" },
             { id: "setting", name: "Setting" },
         ]
+        const messageContentMap = {
+            preprocessing: 'preprocessing',
+            postprocessing: 'postprocessing',
+            excuteResult: 'excuteResult',
+        };
         /**
          * component ref
          */
@@ -145,7 +155,7 @@ export default defineComponent({
 
         const copyToClipboard = (text: string) => {
             navigator.clipboard.writeText(text);
-            ElMessage.success('已复制到剪贴板');
+            ElMessage.success('Copied to clipboard');
         };
 
         const paramsDataChange = async (type: string, val: any, enableHaderRealTimeSync: Ref<boolean>) => {
@@ -196,18 +206,31 @@ export default defineComponent({
                         getAPIRequest();
                     })
                 }
-                ElMessage.success('自动更新成功');
+                ElMessage.success('Automatic update successful');
             }
         }
 
-        const handleCopy = (type: 'preprocessing' | 'postprocessing') => {
-            const rowData = type === 'preprocessing' ? preprocessingEditForm : postprocessingEditForm;
-            navigator.clipboard.writeText(rowData.value.logic);
-            ElMessage.success(`复制${type === 'preprocessing' ? '预处理' : '后处理'}函数成功`);
+        const handleCopy = (type: 'preprocessing' | 'postprocessing' | 'excuteResult') => {
+            const rowDataMap = {
+                preprocessing: preprocessingEditForm.value.logic,
+                postprocessing: postprocessingEditForm.value.logic,
+                excuteResult: excuteResultEditForm.value,
+            };
+            const logic = rowDataMap[type];
+            navigator.clipboard.writeText(logic);
+            ElMessage.success(`Copy successful ${messageContentMap[type]} function`);
         };
 
-        const handleFullPage = (type: 'preprocessing' | 'postprocessing') => {
-            ElMessage.success(`全屏${type === 'preprocessing' ? '预处理' : '后处理'}函数`);
+        const handleFullPage = (type: 'preprocessing' | 'postprocessing' | 'excuteResult') => {
+            // ElMessage.success(`FullPage successful ${messageContentMap[type]} function`);
+            const rowDataMap = {
+                preprocessing: preprocessingEditForm.value.logic,
+                postprocessing: postprocessingEditForm.value.logic,
+                excuteResult: excuteResultEditForm.value,
+            };
+            codePopupMonacoCode.value = rowDataMap[type];
+            codePopupMonacoType.value = type;
+            isShowCodePopupFullScreen.value = true
         };
 
         const handleFold = (type: 'preprocessing' | 'postprocessing', isFold: boolean) => {
@@ -251,9 +274,9 @@ export default defineComponent({
                     excuteResultEditForm.value = result.content;
                     apiStore.changeLoggerData(result.logger);
                 }
-                ElMessage.success('运行成功');
+                ElMessage.success('Run successful');
             } catch (e) {
-                console.error("运行失败", e);
+                console.error("Failed to run", e);
             } finally {
                 loading.value = false;
             }
@@ -288,7 +311,7 @@ export default defineComponent({
 
             apiCall.then((res: any) => {
                 if (res.code === 200) {
-                    ElMessage.success(`保存${type === 'preprocessing' ? '预处理' : '后处理'}函数成功`);
+                    ElMessage.success(`Save ${type === 'preprocessing' ? 'preprocessing' : 'postprocessing'} function successfully`);
                     getProcessingFunction(type);
                 }
             });
@@ -299,7 +322,7 @@ export default defineComponent({
             isOpenDeleteAPIDialog.value = false;
             APIs._DeleteAPIModule(APIInfo.value.id).then((res: any) => {
                 if (res.code === 200) {
-                    ElMessage.success('删除成功');
+                    ElMessage.success('Deleted successfully');
                     router.back();
                 }
             });
@@ -472,6 +495,13 @@ export default defineComponent({
                     isOpen={isOpenDeleteAPIDialog.value}
                     onCancel={() => isOpenDeleteAPIDialog.value = false}
                     onConfirm={handleDelete}
+                />
+                {/* 全屏编辑器部分 */}
+                <codePopupFullScreen
+                    code={codePopupMonacoCode.value}
+                    type={codePopupMonacoType.value}
+                    isOpen={isShowCodePopupFullScreen.value}
+                    onClose={() => isShowCodePopupFullScreen.value = false}
                 />
                 <div class={cn("text-gray-900 dark:text-gray-100 relative h-screen w-full")}>
                     {/* API Info */}
