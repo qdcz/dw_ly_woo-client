@@ -150,7 +150,7 @@ export default defineComponent({
                     const match = res.data.match(regex);
                     if (match) {
                         // 后面路径部分
-                        res.data = `https://${import.meta.env.VITE_MINIO_DOMAIN}/${match[3]}`
+                        res.data = `${import.meta.env.VITE_MINIO_DOMAIN_PREFIX}/${match[3]}`
                     }
 
                     imageCache.set(url, res.data, 1000 * 60 * 20);

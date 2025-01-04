@@ -2,17 +2,17 @@
 
 woo-server 是一个便于用户快速创建API和数据管理的系统，可视化配置操作，支持暗黑模式，支持离线部署部署。
 
-在线地址: https://www.dwly.site:4999/static/admin   账号: admin 密码: admin （第一次进入需要点接口验证跳过 https的不安全请求。）
+在线地址: https://www.dwly.site/static/admin   账号: admin 密码: admin （~~第一次进需要点接口验证跳过 https的不安全请求。~~已申请新的证书和将node的https转移到nginx上代理转发）
 
 前端基于 vue3 + tsx + pinia + tailwindcss;编辑器用的微软的monaco。文件上传基于minio（后端做了签证颁发直接传的minio）。
 
-后端基于 NestJs开发的，docker部署各个数据源 ，nginx 代理路由。node服务采用混淆加二进制打包，pm2守护。
+后端基于 NestJs开发，docker部署各个数据源 ，nginx 代理路由。node服务采用混淆加二进制打包，pm2守护。
 
-接口地址: https://www.dwly.site:4999/documentation;  开源地址:等重构完
+接口地址: https://www.dwly.site/documentation;
 
 编辑器代码执行基于 node的 vm 模块。数据库的对接基于 Typeorm。权限管控基于rbac模型动态路由的控制基于pbac策略模型。socket服务基于ws。token验证基于jwt结合redis做了过期处理。文档基于swagger。日志系统基于log4js文件存储和落库mongodb（后期会解耦出日志分析系统）。
 
-核心部署包 基于express开发。开源地址: 等重构完
+核心部署包 基于express开发。
 
 # 项目遇到的问题
 
