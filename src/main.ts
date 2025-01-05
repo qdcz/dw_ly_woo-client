@@ -34,7 +34,6 @@ initTheme();
 
 app.config.warnHandler = (msg, vm, trace) => {
     if (msg.includes('injection "Symbol(form)" not found')) {
-        // Ignore this warning
         return;
     }
     console.warn(msg, vm, trace);

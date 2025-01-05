@@ -18,8 +18,9 @@ import { ElMessage } from "element-plus";
 import { fa } from "element-plus/es/locale/index.mjs";
 
 let _disposable = null; // 代码补全提示面版
-let completionItems = []; // 提示面版内容
+let utilsFunctions = []; // 提示面版内容
 let _initLoadFunction = false;
+let timers = null;
 
 monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
     target: monaco.languages.typescript.ScriptTarget.ES6,
@@ -130,13 +131,13 @@ export default {
             }
             const { code, data } = await FunctionList(params);
             if (code == 200) {
-                ElMessage.success("查询工具函数成功！");
-                completionItems = data.data.map((method) => ({
+                ElMessage.success("Query tool function successfully!");
+                utilsFunctions = data.data.map((method) => ({
                     label: method.name,
                     insertText: method.name,
-                    kind: monaco.languages.CompletionItemKind.Property,
-                    documentation: `function description：${method.description || undefined
-                        };
+                    kind: monaco.languages.CompletionItemKind.Property, // 类型：函数
+                    detail: method.description,
+                    documentation: `function description：${method.description || undefined};
 params：${JSON.parse(method.params)
                             .map((i, index) =>
                                 index == 0
@@ -145,9 +146,8 @@ params：${JSON.parse(method.params)
                 ${i.key} : ${i.info || undefined}`
                             )
                             .join(` , `)}
-return：功能暂未实现
+return：未定义
 docs: https://github.com`,
-                    detail: method.name,
                 }));
             }
         };
@@ -156,6 +156,42 @@ docs: https://github.com`,
             if (!_initLoadFunction) {
                 _initLoadFunction = true;
                 await functionList();
+
+                // 只注入一次
+                timers = setInterval(() => {
+                    if (monaco) {
+                        clearInterval(timers);
+                        timers = null;
+                        monaco.languages.registerCompletionItemProvider('javascript', {
+                            triggerCharacters: ['.'], // 触发补全的字符
+                            provideCompletionItems: (model, position) => {
+                                const textUntilPosition = model.getValueInRange({
+                                    startLineNumber: position.lineNumber,
+                                    startColumn: 1,
+                                    endLineNumber: position.lineNumber,
+                                    endColumn: position.column,
+                                });
+
+                                // 检测输入是否为 "utils."
+                                if (!textUntilPosition.endsWith('utils.')) {
+                                    return { suggestions: [] };
+                                }
+
+                                // 返回补全项
+                                return {
+                                    suggestions: utilsFunctions.map((func) => ({
+                                        label: func.label,
+                                        kind: monaco.languages.CompletionItemKind.Function, // 类型：函数
+                                        insertText: func.label + '()', // 插入的文本
+                                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, // 指定插入文本的规则，
+                                        detail: func.detail, // 简要描述
+                                        documentation: func.documentation, // 文档说明
+                                    })),
+                                };
+                            },
+                        });
+                    }
+                }, 300);
             }
         });
 
@@ -182,77 +218,81 @@ docs: https://github.com`,
             });
 
             editor.onKeyUp(async (event) => {
-                const currentValue = editor.getValue();
-                const cursorPosition = editor.getPosition();
-                if ([15, 16, 17, 18].includes(event.keyCode)) return;
-                if (
-                    currentValue == "utils." ||
-                    currentValue.includes("utils.")
-                ) {
-                    if (_disposable) {
-                        _disposable.dispose();
-                    }
-                    _disposable =
-                        monaco.languages.registerCompletionItemProvider(
-                            "javascript",
-                            {
-                                triggerCharacters: ["."],
-                                provideCompletionItems: (model, position) => {
-                                    // const { lineNumber, column } = position;
+                // const currentValue = editor.getValue();
+                // const cursorPosition = editor.getPosition();
+                // if ([15, 16, 17, 18].includes(event.keyCode)) return;
+                // if (
+                //     currentValue == "utils." ||
+                //     currentValue.includes("utils.")
+                // ) {
+                //     if (_disposable) {
+                //         _disposable.dispose();
+                //     }
+                //     _disposable =
+                //         monaco.languages.registerCompletionItemProvider(
+                //             "javascript",
+                //             {
+                //                 triggerCharacters: ["."],
+                //                 provideCompletionItems: (model, position) => {
+                //                     // const { lineNumber, column } = position;
 
-                                    /* 获取当前光标所在行的文本 */
-                                    // const beforeEditingText =
-                                    //     model.getValueInRange({
-                                    //         startLineNumber: lineNumber,
-                                    //         startColumn: 0,
-                                    //         endLineNumber: lineNumber,
-                                    //         endColumn: column,
-                                    //     });
+                //                     /* 获取当前光标所在行的文本 */
+                //                     // const beforeEditingText =
+                //                     //     model.getValueInRange({
+                //                     //         startLineNumber: lineNumber,
+                //                     //         startColumn: 0,
+                //                     //         endLineNumber: lineNumber,
+                //                     //         endColumn: column,
+                //                     //     });
 
-                                    /* 正在编辑的单词 */
-                                    // const editingWord = _.last(
-                                    //     beforeEditingText
-                                    //         .trim()
-                                    //         .split(/\s+/)
-                                    // );
+                //                     /* 正在编辑的单词 */
+                //                     // const editingWord = _.last(
+                //                     //     beforeEditingText
+                //                     //         .trim()
+                //                     //         .split(/\s+/)
+                //                     // );
 
-                                    /* .结尾 */
-                                    // if (editingWord.endsWith(".")) {
-                                    //     const wordNoDot = editingWord.slice(
-                                    //         0,
-                                    //         editingWord.length - 1
-                                    //     );
-                                    //     if (
-                                    //         Object.keys(
-                                    //             this._hintData
-                                    //         ).includes(wordNoDot)
-                                    //     ) {
-                                    //         suggestions = [
-                                    //             ...this.getTableSuggest(
-                                    //                 wordNoDot
-                                    //             ),
-                                    //         ];
-                                    //     }
-                                    // } else if (editingWord === ".") {
-                                    //     /* .开头 */
-                                    //     suggestions = [];
-                                    // } else {
-                                    //     suggestions = [
-                                    //         ...this.getDBSuggest(),
-                                    //         ...this.getSQLSuggest(),
-                                    //     ];
-                                    // }
-                                    return {
-                                        suggestions: deepClone(completionItems),
-                                    };
-                                },
-                            }
-                        );
+                //                     /* .结尾 */
+                //                     // if (editingWord.endsWith(".")) {
+                //                     //     const wordNoDot = editingWord.slice(
+                //                     //         0,
+                //                     //         editingWord.length - 1
+                //                     //     );
+                //                     //     if (
+                //                     //         Object.keys(
+                //                     //             this._hintData
+                //                     //         ).includes(wordNoDot)
+                //                     //     ) {
+                //                     //         suggestions = [
+                //                     //             ...this.getTableSuggest(
+                //                     //                 wordNoDot
+                //                     //             ),
+                //                     //         ];
+                //                     //     }
+                //                     // } else if (editingWord === ".") {
+                //                     //     /* .开头 */
+                //                     //     suggestions = [];
+                //                     // } else {
+                //                     //     suggestions = [
+                //                     //         ...this.getDBSuggest(),
+                //                     //         ...this.getSQLSuggest(),
+                //                     //     ];
+                //                     // }
+                //                     return {
+                //                         suggestions: deepClone(utilsFunctions),
+                //                     };
+                //                 },
+                //             }
+                //         );
 
-                    // 设置光标位置
-                    editor.setPosition(cursorPosition);
-                }
+                //     // 设置光标位置
+                //     editor.setPosition(cursorPosition);
+                // }
             });
+
+
+
+
         });
 
         const getContentValue = function () {

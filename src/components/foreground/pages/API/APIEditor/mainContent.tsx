@@ -80,7 +80,7 @@ export default defineComponent({
         const isOpenDeleteAPIDialog = ref<boolean>(false);
         const isShowCodePopupFullScreen = ref<boolean>(false);
         const codePopupMonacoCode = ref<string | null>(null);
-        const codePopupMonacoType = ref<string>('');
+        const codePopupMonacoType = ref<"preprocessing" | "postprocessing" | "excuteResult">('excuteResult');
         const tempApiKey = ref("");
         const tempApiKeyExpirationTime = ref<number | null>(1000 * 60);
         const apiStore = ApiStore();
@@ -282,12 +282,16 @@ export default defineComponent({
             }
         };
 
-        const handleSave = (type: 'preprocessing' | 'postprocessing' | 'excuteResult') => {
+        const handleSave = (type: 'preprocessing' | 'postprocessing' | 'excuteResult', code?: string) => {
             if (type === 'excuteResult') return;
 
             const editorRef = type === 'preprocessing' ? preprocessingEditorRef : postprocessingEditorRef;
-            const content = editorRef.value?.getContentValue();
-
+            let content = ''
+            if (code) {
+                content = code
+            } else {
+                content = editorRef.value?.getContentValue();
+            }
 
             const formData = type === 'preprocessing' ? preprocessingEditForm : postprocessingEditForm;
             const hookType = type === 'preprocessing' ? 1 : 2;
@@ -364,7 +368,7 @@ export default defineComponent({
                             <editorFuncBox
                                 name={type}
                                 paramString={type === 'excuteResult' ? '' : (
-                                    type === 'preprocessing' ? 'params, utils, plugin' : 'data, params, utils, plugin'
+                                    type === 'preprocessing' ? 'params, utils' : 'data, params, utils, plugin'
                                 )}
                                 isShowCopy={true}
                                 isShowFullPage={true}
@@ -502,6 +506,7 @@ export default defineComponent({
                     type={codePopupMonacoType.value}
                     isOpen={isShowCodePopupFullScreen.value}
                     onClose={() => isShowCodePopupFullScreen.value = false}
+                    onSave={(code: string) => handleSave.call(null, codePopupMonacoType.value, code)}
                 />
                 <div class={cn("text-gray-900 dark:text-gray-100 relative h-screen w-full")}>
                     {/* API Info */}

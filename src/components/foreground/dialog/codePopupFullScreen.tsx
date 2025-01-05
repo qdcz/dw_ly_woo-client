@@ -33,13 +33,9 @@ export default defineComponent({
             type: String,
             validator: (value: string) => ['preprocessing', 'postprocessing', 'excuteResult'].includes(value),
             default: ""
-        },
-        dataSourceId: {
-            type: String,
-            default: ""
         }
     },
-    emits: ["close",],
+    emits: ["close", 'save'],
     setup(props, { emit }) {
 
         const monacoEditorRef = ref<any>(null);
@@ -59,34 +55,8 @@ export default defineComponent({
         }, { immediate: true })
 
         const handleSave = () => {
-            ElMessage.warning(`In development`);
-            // const content = monacoEditorRef.value?.getContentValue();
-            // const formData = type === 'preprocessing' ? preprocessingEditForm : postprocessingEditForm;
-            // const hookType = type === 'preprocessing' ? 1 : 2;
-            // const apiCall = !formData.value.id ?
-            //     APIs._APIModuleAddHook({
-            //         apiId: APIInfo.value.id,
-            //         hookType,
-            //         logic: content,
-            //         name: `api_${type}_${APIInfo.value.id}`,
-            //         description: `适用于${APIInfo.value.id}接口的${type === 'preprocessing' ? '预处理' : '后处理'}脚本`,
-            //     }) :
-            //     APIs._UpdateAPIModuleHook({
-            //         id: formData.value.id,
-            //         data: {
-            //             name: formData.value.name,
-            //             logic: content,
-            //             description: formData.value.description,
-            //             type: hookType,
-            //         }
-            //     });
-
-            // apiCall.then((res: any) => {
-            //     if (res.code === 200) {
-            //         ElMessage.success(`保存${type === 'preprocessing' ? '预处理' : '后处理'}函数成功`);
-            //         getProcessingFunction(type);
-            //     }
-            // });
+            const content = monacoEditorRef.value?.getContentValue();
+            emit('save', content);
         }
 
         return () => (
@@ -104,7 +74,7 @@ export default defineComponent({
                                     bottomTip={props.type === 'excuteResult' ? '' : 'Hold 【ctrl + s】 to save'}
                                     name={props.type}
                                     paramString={props.type === 'excuteResult' ? '' : (
-                                        props.type === 'preprocessing' ? 'params, utils, plugin' : 'data, params, utils, plugin'
+                                        props.type === 'preprocessing' ? 'params, utils' : 'data, params, utils'
                                     )}
                                 >
                                     <MonacoEditor

@@ -5,11 +5,6 @@ import { UserStore, LayoutStore } from "../store/index";
 
 const routes = [
     {
-        path: "/",
-        component: () => import("../view/home.vue"),
-        meta: { title: "Home Page", layout: "backstage" },
-    },
-    {
         path: "/login",
         component: () => import("../view/login.vue"),
         meta: { title: "login", layout: "foreground" },
@@ -109,6 +104,11 @@ const routes = [
         path: "/APIEditor",
         component: () => import("../components/foreground/pages/API/APIEditor/APIEditor.tsx"),
         meta: { title: "APIEditor", layout: "backstage" },
+    },
+    {
+        path: "/",
+        component: () => import("../components/foreground/pages/Home/Home.tsx"),
+        meta: { title: "Home", layout: "backstage" },
     },
 ];
 

@@ -10,6 +10,7 @@ import DataBaseIcon from "./icon/DataBase.tsx";
 import APIIcon from "./icon/API.tsx";
 import FoldIcon from "./icon/Fold.tsx";
 import CloseIcon from "./icon/Close.tsx";
+import HomeIcon from "./icon/Home.tsx";
 import { LEFT_SIDEBAR_WIDTH } from "@/constants";
 import { cn, throttle } from "@/utils/index";
 import * as APIs from '../../api/index.ts';
@@ -23,7 +24,8 @@ export default defineComponent({
         DataBaseIcon,
         APIIcon,
         FoldIcon,
-        CloseIcon
+        CloseIcon,
+        HomeIcon
     },
     setup() {
         const userStore = UserStore();
@@ -55,67 +57,72 @@ export default defineComponent({
 
         const menuList = ref([
             {
+                name: "Home",
+                icon: <HomeIcon />,
+                path: "/static/admin/",
+            },
+            {
                 name: "API",
                 icon: <APIIcon />,
                 path: "/static/admin/#/API",
             },
             {
-                name: "Old_API",
+                name: "APIManager",
                 icon: <APIIcon />,
                 path: "/static/admin/#/APIManager",
             },
             {
-                name: "Old_FunctionManager",
+                name: "FunctionManager",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/FunctionManager",
             },
             {
-                name: "Old_ActiveKeyManager",
+                name: "ActiveKeyManager",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/ActiveKeyManager",
             },
             {
-                name: "Old_LogManager",
+                name: "LogManager",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/logManager",
             },
             {
-                name: "Old_MockManager",
+                name: "MockManager",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/MockManager",
             },
             {
-                name: "Old_SqlDataUnit",
+                name: "SqlDataUnit",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/SqlDataUnit",
             },
             {
-                name: "Old_ProjectManager",
+                name: "ProjectManager",
                 icon: <ProjectIcon />,
                 path: "/static/admin/#/ProjectManager",
             },
             {
-                name: "Old_DataBaseManager",
+                name: "DataBaseManager",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/dataSource",
             },
             {
-                name: "Old_UserManager",
+                name: "UserManager",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/userManager",
             },
             {
-                name: "Old_RoleManager",
+                name: "RoleManager",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/roleManager",
             },
             {
-                name: "Old_TacticsManager",
+                name: "TacticsManager",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/TacticsManager",
             },
             {
-                name: "Old_SystemAPIManager",
+                name: "SystemAPIManager",
                 icon: <DataBaseIcon />,
                 path: "/static/admin/#/SystemAPIManager",
             },
@@ -274,7 +281,11 @@ export default defineComponent({
                             </div>
 
                             {/* Main content */}
-                            <main class={cn("flex-1 bg-white dark:bg-gray-900 px-4 lg:pr-4 lg:m-2 lg:rounded-lg lg:shadow-sm overflow-auto no-scrollbar")}>
+                            <main class={cn(
+                                "flex-1 bg-white dark:bg-gray-900 overflow-auto no-scrollbar px-4",
+                                "pt-4 md:pt-0 lg:pt-0 xl:pt-0",
+                                "lg:pr-4 lg:m-2 lg:rounded-lg lg:shadow-sm"
+                            )}>
                                 <div class={cn("mt-8")}>
                                     <router-view></router-view>
                                 </div>
