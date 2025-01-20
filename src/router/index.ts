@@ -101,6 +101,11 @@ const routes = [
         meta: { title: "API", layout: "backstage" },
     },
     {
+        path: "/Project",
+        component: () => import("../components/foreground/pages/Project/Project.tsx"),
+        meta: { title: "Project", layout: "backstage" },
+    },
+    {
         path: "/APIEditor",
         component: () => import("../components/foreground/pages/API/APIEditor/APIEditor.tsx"),
         meta: { title: "APIEditor", layout: "backstage" },

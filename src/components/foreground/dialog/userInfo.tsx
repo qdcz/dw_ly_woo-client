@@ -80,8 +80,6 @@ export default defineComponent({
 
         const changeAvatar = async (event) => {
             const file = event.target.files[0];
-            console.log(file); // 获取选择的文件列表
-
 
             // 生成预操作的url
             const { code, data }: any = await APIs.UploadImage({
@@ -92,17 +90,19 @@ export default defineComponent({
             });
 
             // 替换预签名URL中的域名和端口
-            const minioEndpoint = import.meta.env.VITE_MINIO_ENDPOINT;
-            const minioPort = import.meta.env.VITE_MINIO_PORT;
-            const minioBase = `${minioEndpoint}:${minioPort}`;
+            // const minioEndpoint = import.meta.env.VITE_MINIO_ENDPOINT;
+            // const minioPort = import.meta.env.VITE_MINIO_PORT;
+            // const minioBase = `${minioEndpoint}:${minioPort}`;
+            const minioBase = `${import.meta.env.VITE_MINIO_DOMAIN_PREFIX}`;
 
             if (code !== 200) {
                 ElMessage.error("生成预上传链接失败");
                 return
             }
 
-            const uploadImageUrl = data.replace(/http:\/\/[^\/]+:\d+/g, `http://${minioBase}`);
-            console.log("uploadImageUrl", uploadImageUrl);
+            // const uploadImageUrl = data.replace(/http:\/\/[^\/]+:\d+/g, `http://${minioBase}`);
+            const uploadImageUrl = data.replace(/http:\/\/[^\/]+:\d+/g, minioBase);
+            // console.log("uploadImageUrl", uploadImageUrl);
 
             // 使用自定义上传
             const xhr = new XMLHttpRequest();

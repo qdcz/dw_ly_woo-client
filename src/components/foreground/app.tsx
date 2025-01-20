@@ -67,6 +67,11 @@ export default defineComponent({
                 path: "/static/admin/#/API",
             },
             {
+                name: "Project",
+                icon: <APIIcon />,
+                path: "/static/admin/#/Project",
+            },
+            {
                 name: "APIManager",
                 icon: <APIIcon />,
                 path: "/static/admin/#/APIManager",

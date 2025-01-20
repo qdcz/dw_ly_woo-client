@@ -1,5 +1,7 @@
 import { defineComponent, inject, nextTick, ref } from 'vue';
 import { cn } from '@/utils/tailwindcss';
+
+import ClearIcon from '../icon/Close';
 import { FORM_INJECTION_KEY } from '@/tokens';
 
 export default defineComponent({
@@ -33,6 +35,7 @@ export default defineComponent({
         }
     },
     emits: ['dataChange', "update:modelValue", "enterPressed"],
+    components: { ClearIcon },
     setup(props, { emit }) {
 
         // 表单的验证错误信息
@@ -70,6 +73,11 @@ export default defineComponent({
                 emit('enterPressed');
             }
         };
+
+        const handleClear = () => {
+            emit('update:modelValue', "");
+            emit('dataChange', "");
+        }
 
         return () => (
             <div class="relative w-full h-full">
@@ -115,6 +123,19 @@ export default defineComponent({
                         disabled={props.disabled}
                     />
                 )}
+
+                {/* 清除按钮 */}
+                {
+                    props.modelValue ? (
+                        <div class="absolute right-2 top-1/2 -translate-y-1/2" onClick={handleClear}>
+                            <ClearIcon width="6" height="6"
+                                class={cn("cursor-pointer  border-gray-200 dark:border-gray-600 rounded p-1")}
+                                colorClass="text-gray-400 dark:text-gray-300"
+                                hoverClass="hover:text-red-500 dark:hover:text-blue-400"
+                            />
+                        </div>
+                    ) : ""
+                }
 
                 {/* field check error */}
                 {
